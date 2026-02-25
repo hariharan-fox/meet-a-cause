@@ -32,20 +32,6 @@ export type NGO = {
   impact: string;
 };
 
-export type ForumPost = {
-  id: string;
-  title: string;
-  authorId: string;
-  authorName:string;
-  createdAt: string;
-  replies: number;
-  lastReply: {
-    authorId: string;
-    authorName: string;
-    createdAt: string;
-  };
-};
-
 export type Testimonial = {
   quote: string;
   name: string;

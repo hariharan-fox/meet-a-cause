@@ -1,4 +1,4 @@
-import type { Volunteer, Event, NGO, ForumPost, Testimonial } from './types';
+import type { Volunteer, Event, NGO, Testimonial } from './types';
 
 export const volunteer: Volunteer = {
   id: 'vol-1',
@@ -139,48 +139,6 @@ export const allEvents: Event[] = [
 
 export const featuredEvents = allEvents.slice(0, 2);
 export const upcomingCommitments = allEvents.slice(3, 5);
-
-export const forumPosts: ForumPost[] = [
-  {
-    id: 'post-1',
-    title: 'Best practices for first-time volunteers?',
-    authorId: 'vol-2',
-    authorName: 'Arjun',
-    createdAt: '2 days ago',
-    replies: 5,
-    lastReply: {
-      authorId: 'ngo-1',
-      authorName: 'Green Earth',
-      createdAt: '3 hours ago',
-    }
-  },
-  {
-    id: 'post-2',
-    title: 'How do you measure impact for educational programs?',
-    authorId: 'ngo-3',
-    authorName: 'Tech Forward',
-    createdAt: '5 days ago',
-    replies: 12,
-    lastReply: {
-      authorId: 'vol-1',
-      authorName: 'Priya Sharma',
-      createdAt: '1 day ago',
-    }
-  },
-  {
-    id: 'post-3',
-    title: 'Share your most memorable volunteering experience!',
-    authorId: 'vol-3',
-    authorName: 'Sameer',
-    createdAt: '1 week ago',
-    replies: 28,
-    lastReply: {
-      authorId: 'vol-4',
-      authorName: 'Anika',
-      createdAt: 'just now',
-    }
-  }
-];
 
 export const howItWorks = [
   {
