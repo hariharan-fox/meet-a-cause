@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { CheckCircle, Clock, Award, Users } from "lucide-react";
+import { CheckCircle, Clock, Award, Users, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { volunteer, featuredEvents, featuredNgos, upcomingCommitments } from "@/lib/placeholder-data";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -47,15 +47,20 @@ export default function DashboardPage() {
             <p className="text-xs text-muted-foreground">+2 since last month</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Certificates Earned</CardTitle>
-            <Award className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-lg font-bold">2</div>
-            <p className="text-xs text-muted-foreground">Community Leader</p>
-          </CardContent>
+        <Card className="hover:bg-accent transition-colors">
+          <Link href="/dashboard/my-impact">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">Badges Earned</CardTitle>
+              <Award className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div className="text-lg font-bold">3</div>
+                <ArrowRight className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <p className="text-xs text-muted-foreground">View all badges</p>
+            </CardContent>
+          </Link>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">

@@ -12,7 +12,7 @@ const navLinks = [
     { href: '/', label: 'Dashboard', icon: Home },
     { href: '/events', label: 'Events', icon: Calendar },
     { href: '/ngos', label: 'NGOs', icon: Building },
-    { href: '/dashboard/my-impact', label: 'My Impact', icon: Award },
+    { href: '/dashboard/my-impact', label: 'My Badges', icon: Award },
 ];
 
 export default function Sidebar() {

@@ -5,11 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { volunteer } from "@/lib/placeholder-data";
+import { volunteer, completedEvents } from "@/lib/placeholder-data";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { useAuth } from "@/lib/auth-context";
-import { LogOut } from "lucide-react";
+import { LogOut, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export default function SettingsPage() {
   const { user, logout } = useAuth();
@@ -20,7 +21,7 @@ export default function SettingsPage() {
   return (
     <div className="container mx-auto px-4 md:px-6 py-8">
       <div className="max-w-3xl mx-auto space-y-8">
-        <h1 className="text-lg font-bold">Settings</h1>
+        <h1 className="text-lg font-bold">My Profile & Settings</h1>
         
         <Card>
           <CardHeader>
@@ -51,6 +52,46 @@ export default function SettingsPage() {
             <Button>Update Profile</Button>
           </CardContent>
         </Card>
+
+        <section>
+          <h2 className="text-lg font-bold mb-4">Event History</h2>
+          <Card>
+            <CardContent className="p-0">
+              <ul className="divide-y">
+                {completedEvents.length > 0 ? (
+                  completedEvents.map((event) => {
+                    const eventImage = PlaceHolderImages.find(p => p.id === event.imageUrl);
+                    return (
+                      <li key={event.id} className="p-4">
+                        <div className="flex items-center justify-between gap-4 flex-wrap">
+                          <div className="flex items-center gap-4">
+                            {eventImage && (
+                              <Avatar className="h-12 w-12 rounded-md">
+                                <AvatarImage src={eventImage.imageUrl} alt={event.title} className="rounded-md" data-ai-hint={eventImage.imageHint} />
+                                <AvatarFallback className="rounded-md">{event.title.charAt(0)}</AvatarFallback>
+                              </Avatar>
+                            )}
+                            <div>
+                              <p className="font-semibold text-sm">{event.title}</p>
+                              <p className="text-xs text-muted-foreground">{event.date}</p>
+                            </div>
+                          </div>
+                          <Button asChild variant="outline" size="sm">
+                            <Link href={`/events/${event.id}`}>
+                              View Impact <ArrowRight className="ml-2 h-3 w-3" />
+                            </Link>
+                          </Button>
+                        </div>
+                      </li>
+                    );
+                  })
+                ) : (
+                  <p className="text-muted-foreground text-sm p-6 text-center">You haven't completed any events yet.</p>
+                )}
+              </ul>
+            </CardContent>
+          </Card>
+        </section>
 
         <Card>
           <CardHeader>
