@@ -10,18 +10,27 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { cn } from '@/lib/utils';
 import { Share2, Linkedin, Twitter } from 'lucide-react';
 
-const levelBorderColors: { [key: string]: string } = {
-  Bronze: 'border-yellow-600/60',
-  Silver: 'border-slate-400/60',
-  Gold: 'border-amber-400/60',
-  Platinum: 'border-cyan-400/60',
-};
-
-const levelIconColors: { [key:string]: string } = {
-    Bronze: 'text-yellow-600',
-    Silver: 'text-slate-400',
-    Gold: 'text-amber-400',
-    Platinum: 'text-cyan-400',
+const levelStyles: { [key: string]: { border: string; bg: string; icon: string } } = {
+  Bronze: {
+    border: 'border-amber-600/80',
+    bg: 'bg-gradient-to-b from-amber-300 to-amber-500',
+    icon: 'text-amber-900',
+  },
+  Silver: {
+    border: 'border-slate-400/80',
+    bg: 'bg-gradient-to-b from-slate-200 to-slate-400',
+    icon: 'text-slate-900',
+  },
+  Gold: {
+    border: 'border-yellow-500/80',
+    bg: 'bg-gradient-to-b from-yellow-300 to-yellow-500',
+    icon: 'text-yellow-900',
+  },
+  Platinum: {
+    border: 'border-cyan-500/80',
+    bg: 'bg-gradient-to-b from-cyan-300 to-teal-500',
+    icon: 'text-cyan-900',
+  },
 };
 
 export default function BadgesPage() {
@@ -50,55 +59,66 @@ export default function BadgesPage() {
     setShareDialogOpen(false);
   };
 
-  const BadgeIcon = ({ badge }: { badge: Certificate }) => (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger
-          onClick={() => handleBadgeClick(badge)}
-          className={cn(
-            'transition-transform hover:scale-110',
-            badge.isEarned ? 'cursor-pointer' : 'cursor-default'
-          )}
-        >
-          <div
+  const BadgeIcon = ({ badge }: { badge: Certificate }) => {
+    const level = badge.level || 'Bronze';
+    const styles = badge.isEarned ? levelStyles[level] : null;
+
+    return (
+      <TooltipProvider>
+        <Tooltip delayDuration={100}>
+          <TooltipTrigger
+            onClick={() => handleBadgeClick(badge)}
             className={cn(
-              'flex items-center justify-center h-24 w-24 rounded-full border-4 bg-card shadow-md',
-              badge.isEarned
-                ? levelBorderColors[badge.level || 'Bronze']
-                : 'border-muted',
-              !badge.isEarned && 'grayscale opacity-50'
+              'transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-full',
+              badge.isEarned ? 'cursor-pointer' : 'cursor-default'
             )}
           >
-            <badge.icon
+            <div
               className={cn(
-                'h-12 w-12',
-                badge.isEarned
-                  ? levelIconColors[badge.level || 'Bronze']
-                  : 'text-muted-foreground'
+                'relative flex items-center justify-center h-24 w-24 rounded-full border-[6px] shadow-lg overflow-hidden',
+                badge.isEarned && styles
+                  ? [styles.border, styles.bg]
+                  : 'border-muted bg-muted/40',
+                !badge.isEarned && 'grayscale opacity-60'
               )}
-            />
-          </div>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p className="font-bold">{badge.name} {badge.level && `(${badge.level})`}</p>
-          <p className="text-sm text-muted-foreground">{badge.description}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
+            >
+              {badge.isEarned && (
+                <div className="absolute top-0 left-0 w-full h-full">
+                    <div className="absolute -top-4 -left-8 w-24 h-12 bg-white/20 rounded-full rotate-45 blur-md" />
+                </div>
+              )}
+              <badge.icon
+                className={cn(
+                  'h-12 w-12 drop-shadow-lg',
+                  badge.isEarned && styles
+                    ? styles.icon
+                    : 'text-muted-foreground'
+                )}
+              />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent className="bg-background border-border text-center">
+            <p className="font-bold text-base">{badge.name} {badge.level && `(${badge.level})`}</p>
+            <p className="text-sm text-muted-foreground max-w-xs">{badge.description}</p>
+            {!badge.isEarned && <p className="text-xs text-primary mt-1 font-semibold">Keep going to unlock!</p>}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  };
 
   return (
     <>
       <div className="container mx-auto px-4 md:px-6 py-8 space-y-12">
-        <div>
-          <h1 className="text-xl font-bold">My Badges</h1>
-          <p className="text-muted-foreground text-sm">
-            Recognizing your dedication and impact. Keep up the great work!
+        <div className="text-center">
+          <h1 className="text-2xl font-bold">My Badges</h1>
+          <p className="text-muted-foreground text-sm max-w-2xl mx-auto mt-2">
+            Recognizing your dedication and impact. Each badge represents a milestone in your volunteering journey. Keep up the great work!
           </p>
         </div>
 
         <section>
-          <h2 className="text-lg font-bold mb-6">
+          <h2 className="text-lg font-bold mb-6 text-center sm:text-left">
             Earned Badges ({earnedBadges.length})
           </h2>
           <div className="flex flex-wrap gap-x-6 gap-y-8 justify-center sm:justify-start">
@@ -109,7 +129,7 @@ export default function BadgesPage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-bold mb-6">
+          <h2 className="text-lg font-bold mb-6 text-center sm:text-left">
             Badges to Unlock ({unearnedBadges.length})
           </h2>
           <div className="flex flex-wrap gap-x-6 gap-y-8 justify-center sm:justify-start">
