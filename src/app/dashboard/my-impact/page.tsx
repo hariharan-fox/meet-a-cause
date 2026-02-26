@@ -8,9 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
-import { Share2, Linkedin, Twitter } from 'lucide-react';
+import { Share2, Linkedin, Twitter, CheckCircle2 } from 'lucide-react';
 
-const Badge = ({ badge }: { badge: Certificate }) => {
+const Badge = ({ badge, size = 'medium' }: { badge: Certificate; size?: 'medium' | 'large' }) => {
   const SHAPE_PATHS = {
     circle: "M 50, 50 m -48, 0 a 48,48 0 1,0 96,0 a 48,48 0 1,0 -96,0",
     pentagon: "M 50,2 L 98,35 L 80,98 L 20,98 L 2,35 Z",
@@ -48,42 +48,42 @@ const Badge = ({ badge }: { badge: Certificate }) => {
 
   const colors = badge.isEarned ? LEVEL_COLORS[badge.level || 'Bronze'] : UnearnedColor;
   const shape = badge.shape || 'circle';
+  const isLarge = size === 'large';
   
   const bgGradientId = `bg-gradient-${badge.id.replace(/[^a-zA-Z0-9-]/g, '')}`;
   const borderGradientId = `border-gradient-${badge.id.replace(/[^a-zA-Z0-9-]/g, '')}`;
 
   return (
-    <div className="flex flex-col items-center w-28 text-center group">
-        <div className={cn("relative w-24 h-24 transition-transform group-hover:scale-110", badge.isEarned ? 'cursor-pointer' : 'cursor-default')}>
-            <svg viewBox="0 0 100 100" className={cn("absolute inset-0 w-full h-full drop-shadow-md", !badge.isEarned && "saturate-0 opacity-70")}>
-                <defs>
-                    <linearGradient id={borderGradientId} x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" style={{ stopColor: colors.border[0] }} />
-                        <stop offset="100%" style={{ stopColor: colors.border[1] }} />
-                    </linearGradient>
-                     <linearGradient id={bgGradientId} x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" style={{ stopColor: colors.bg[0] }} />
-                        <stop offset="100%" style={{ stopColor: colors.bg[1] }} />
-                    </linearGradient>
-                </defs>
-                
-                <path d={SHAPE_PATHS[shape]} fill={`url(#${borderGradientId})`} />
-                <path d={SHAPE_PATHS[shape]} fill={`url(#${bgGradientId})`} transform="translate(8, 8) scale(0.84)" />
-            </svg>
+    <div className={cn("relative group", isLarge ? "w-40 h-40" : "w-24 h-24", badge.isEarned && 'cursor-pointer' )}>
+        <svg viewBox="0 0 100 100" className={cn("absolute inset-0 w-full h-full drop-shadow-md", !badge.isEarned && "saturate-0 opacity-70")}>
+            <defs>
+                <linearGradient id={borderGradientId} x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style={{ stopColor: colors.border[0] }} />
+                    <stop offset="100%" style={{ stopColor: colors.border[1] }} />
+                </linearGradient>
+                 <linearGradient id={bgGradientId} x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style={{ stopColor: colors.bg[0] }} />
+                    <stop offset="100%" style={{ stopColor: colors.bg[1] }} />
+                </linearGradient>
+            </defs>
             
-            <div className={cn("relative z-10 flex flex-col items-center justify-center w-full h-full p-2", colors.text)}>
-                <badge.icon className="w-9 h-9" />
-                <span className="text-lg font-bold mt-1 drop-shadow-sm">{badge.description.match(/\d+/)?.[0] || ''}</span>
-            </div>
+            <path d={SHAPE_PATHS[shape]} fill={`url(#${borderGradientId})`} />
+            <path d={SHAPE_PATHS[shape]} fill={`url(#${bgGradientId})`} transform="translate(8, 8) scale(0.84)" />
+        </svg>
+        
+        <div className={cn("relative z-10 flex flex-col items-center justify-center w-full h-full p-2", colors.text)}>
+            <badge.icon className={cn(isLarge ? "w-16 h-16" : "w-9 h-9")} />
+            <span className={cn("font-bold drop-shadow-sm", isLarge ? "text-3xl mt-2" : "text-lg mt-1")}>
+              {badge.description.match(/\d+/)?.[0] || ''}
+            </span>
         </div>
-        <p className="text-xs font-semibold mt-2 h-8">{badge.name}</p>
     </div>
   );
 };
 
 
 export default function BadgesPage() {
-  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [selectedBadge, setSelectedBadge] = useState<Certificate | null>(null);
   const { toast } = useToast();
 
@@ -91,10 +91,8 @@ export default function BadgesPage() {
   const unearnedBadges = allCertificates.filter((c) => !c.isEarned);
   
   const handleBadgeClick = (badge: Certificate) => {
-    if (badge.isEarned) {
-      setSelectedBadge(badge);
-      setShareDialogOpen(true);
-    }
+    setSelectedBadge(badge);
+    setDetailDialogOpen(true);
   };
 
   const copyToClipboard = () => {
@@ -105,8 +103,17 @@ export default function BadgesPage() {
       title: 'Link Copied!',
       description: 'You can now share your achievement.',
     });
-    setShareDialogOpen(false);
+    setDetailDialogOpen(false);
   };
+  
+  const LEVEL_BG_COLORS = {
+    Bronze: "from-amber-100 to-amber-200",
+    Silver: "from-slate-100 to-slate-200",
+    Gold: "from-yellow-100 to-yellow-200",
+    Platinum: "from-sky-100 to-sky-200",
+  };
+  const UnearnedBgColor = "from-gray-100 to-gray-200";
+  const bgGradient = selectedBadge?.isEarned ? LEVEL_BG_COLORS[selectedBadge.level || 'Bronze'] : UnearnedBgColor;
 
   const BadgeDisplay = ({ badge }: { badge: Certificate }) => {
     return (
@@ -114,9 +121,12 @@ export default function BadgesPage() {
         <Tooltip delayDuration={100}>
           <TooltipTrigger
             onClick={() => handleBadgeClick(badge)}
-            className="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg"
+            className="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg transition-transform hover:scale-110"
           >
-            <Badge badge={badge} />
+            <div className="flex flex-col items-center w-28 text-center">
+              <Badge badge={badge} />
+              <p className="text-xs font-semibold mt-2 h-8">{badge.name}</p>
+            </div>
           </TooltipTrigger>
           <TooltipContent className="bg-background border-border text-center">
             <p className="font-bold text-base">{badge.name} {badge.level && `(${badge.level})`}</p>
@@ -164,28 +174,51 @@ export default function BadgesPage() {
         </section>
       </div>
 
-      <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Share Your Achievement!</DialogTitle>
-            <DialogDescription>
-              You've earned the "{selectedBadge?.name}" badge. Share your success with your network.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col space-y-2">
-            <Button variant="outline">
-              <Twitter className="mr-2 h-4 w-4" />
-              Share on X
-            </Button>
-            <Button variant="outline">
-              <Linkedin className="mr-2 h-4 w-4" />
-              Share on LinkedIn
-            </Button>
-            <Button onClick={copyToClipboard}>
-              <Share2 className="mr-2 h-4 w-4" />
-              Copy Share Link
-            </Button>
-          </div>
+      <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
+        <DialogContent className="sm:max-w-sm p-0 border-none bg-transparent shadow-none">
+          {selectedBadge && (
+            <div className="bg-card rounded-xl shadow-lg overflow-hidden">
+              <div className={cn("relative p-8 pt-12 flex flex-col items-center bg-gradient-to-b", bgGradient)}>
+                <Badge badge={selectedBadge} size="large" />
+              </div>
+              <div className="p-6 text-center space-y-3">
+                <h2 className="text-xl font-bold">{selectedBadge.name} {selectedBadge.level && `(${selectedBadge.level})`}</h2>
+                <p className="text-muted-foreground text-sm">{selectedBadge.description}</p>
+                
+                {selectedBadge.isEarned ? (
+                  <div className="flex items-center justify-center gap-2 text-primary font-semibold text-sm">
+                    <CheckCircle2 className="h-4 w-4" />
+                    <span>Badge Unlocked</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center gap-2 text-muted-foreground font-semibold text-sm">
+                    <span>Badge Locked</span>
+                  </div>
+                )}
+
+                {selectedBadge.isEarned && (
+                  <div className="pt-4 flex flex-col space-y-2">
+                     <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Share Your Achievement</p>
+                    <Button variant="outline">
+                      <Twitter className="mr-2 h-4 w-4" />
+                      Share on X
+                    </Button>
+                    <Button variant="outline">
+                      <Linkedin className="mr-2 h-4 w-4" />
+                      Share on LinkedIn
+                    </Button>
+                    <Button onClick={copyToClipboard}>
+                      <Share2 className="mr-2 h-4 w-4" />
+                      Copy Share Link
+                    </Button>
+                  </div>
+                )}
+                 <div className="pt-4">
+                  <p className="text-xs text-muted-foreground">Powered by Just Hands</p>
+                </div>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </>
