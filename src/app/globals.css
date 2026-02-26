@@ -4,57 +4,35 @@
 
 @layer base {
   :root {
-    --background: 224 71% 4%; /* Deep Blue */
-    --foreground: 210 40% 98%; /* Almost White */
+    --background: 0 0% 100%; /* White */
+    --foreground: 224 71% 12%; /* Dark Blue */
 
-    --card: 224 71% 10%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 71% 12%;
 
-    --popover: 224 71% 6%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71% 12%;
 
-    --primary: 173 92% 45%; /* Vibrant Cyan */
-    --primary-foreground: 224 71% 10%;
+    --primary: 262 84% 59%; /* Violet */
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 6% 10%;
 
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
 
-    --accent: 217 33% 20%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 240 5% 92%;
+    --accent-foreground: 240 6% 10%;
 
-    --destructive: 0 63% 31%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217 33% 25%;
-    --input: 217 33% 25%;
-    --ring: 173 92% 45%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 262 84% 59%;
 
     --radius: 0.75rem;
-  }
-
-  .dark {
-    --background: 224 71% 4%;
-    --foreground: 210 40% 98%;
-    --card: 224 71% 10%;
-    --card-foreground: 210 40% 98%;
-    --popover: 224 71% 6%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 173 92% 45%;
-    --primary-foreground: 224 71% 10%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 217 33% 20%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 25%;
-    --input: 217 33% 25%;
-    --ring: 173 92% 45%;
   }
 }
 
@@ -65,8 +43,9 @@
 
   body {
     @apply bg-background text-foreground;
-    background-image: radial-gradient(circle at 10% 20%, hsl(var(--primary) / 0.1), transparent 40%),
-                      radial-gradient(circle at 90% 80%, hsl(var(--primary) / 0.1), transparent 40%);
+    background-image: radial-gradient(circle at 15% 50%, hsl(var(--primary) / 0.05), transparent 30%),
+                      radial-gradient(circle at 85% 40%, hsl(var(--primary) / 0.05), transparent 30%),
+                      radial-gradient(circle at 50% 95%, hsl(var(--primary) / 0.03), transparent 25%);
   }
 
   h1,

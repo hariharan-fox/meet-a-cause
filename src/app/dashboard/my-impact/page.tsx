@@ -43,7 +43,7 @@ const Badge = ({ badge, size = 'medium' }: { badge: Certificate; size?: 'medium'
   const UnearnedColor = {
     bg: ["#f3f4f6", "#e5e7eb"],
     border: ["#f9fafb", "#f3f4f6"],
-    text: "text-gray-400",
+    text: "text-gray-500",
   };
 
   const colors = badge.isEarned ? LEVEL_COLORS[badge.level || 'Bronze'] : UnearnedColor;

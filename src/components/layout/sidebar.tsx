@@ -20,7 +20,7 @@ export default function Sidebar() {
     const { logout } = useAuth();
 
     return (
-        <aside className="hidden border-r bg-background/60 backdrop-blur-xl md:block sticky top-0 h-screen">
+        <aside className="hidden border-r bg-background/80 backdrop-blur-lg md:block sticky top-0 h-screen">
             <div className="flex h-full max-h-screen flex-col gap-2">
                 <div className="flex h-16 items-center border-b px-6">
                     <Logo />

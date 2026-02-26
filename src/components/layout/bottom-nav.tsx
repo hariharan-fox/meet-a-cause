@@ -17,7 +17,7 @@ export default function BottomNav() {
     const pathname = usePathname();
 
     return (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-xl border-t">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-t">
             <div className="flex justify-around h-16 items-center">
                 {navLinks.map((link) => {
                     const isActive = link.href === '/' ? pathname === link.href : pathname.startsWith(link.href);
