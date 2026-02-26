@@ -1,5 +1,5 @@
 import type { Volunteer, Event, NGO, Testimonial, Certificate } from './types';
-import { BookOpen, Sprout, HeartPulse, Users, ShieldCheck, Rocket, Star, Heart, Medal, Trophy, Gem, Crown, Zap, TrendingUp } from 'lucide-react';
+import { BookOpen, Sprout, HeartPulse, Users, ShieldCheck, Rocket, Star, Heart, Medal, Trophy, Gem, Crown, Zap, TrendingUp, Award } from 'lucide-react';
 
 export const volunteer: Volunteer = {
   id: 'vol-1',
