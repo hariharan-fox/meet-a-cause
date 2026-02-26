@@ -12,24 +12,24 @@ import { Share2, Linkedin, Twitter } from 'lucide-react';
 
 const levelStyles: { [key: string]: { border: string; bg: string; icon: string } } = {
   Bronze: {
-    border: 'border-amber-600/80',
-    bg: 'bg-gradient-to-b from-amber-300 to-amber-500',
-    icon: 'text-amber-900',
+    border: 'border-amber-800/90',
+    bg: 'bg-gradient-to-br from-amber-400 to-amber-700',
+    icon: 'text-white/90',
   },
   Silver: {
-    border: 'border-slate-400/80',
-    bg: 'bg-gradient-to-b from-slate-200 to-slate-400',
+    border: 'border-slate-500/90',
+    bg: 'bg-gradient-to-br from-slate-200 to-slate-400',
     icon: 'text-slate-900',
   },
   Gold: {
-    border: 'border-yellow-500/80',
-    bg: 'bg-gradient-to-b from-yellow-300 to-yellow-500',
-    icon: 'text-yellow-900',
+    border: 'border-yellow-500/90',
+    bg: 'bg-gradient-to-br from-yellow-200 to-yellow-500',
+    icon: 'text-yellow-950',
   },
   Platinum: {
-    border: 'border-cyan-500/80',
-    bg: 'bg-gradient-to-b from-cyan-300 to-teal-500',
-    icon: 'text-cyan-900',
+    border: 'border-cyan-500/90',
+    bg: 'bg-gradient-to-br from-slate-50 to-cyan-300',
+    icon: 'text-cyan-950',
   },
 };
 
@@ -75,21 +75,25 @@ export default function BadgesPage() {
           >
             <div
               className={cn(
-                'relative flex items-center justify-center h-24 w-24 rounded-full border-[6px] shadow-lg overflow-hidden',
+                'relative flex items-center justify-center h-24 w-24 rounded-full border-[6px] shadow-xl overflow-hidden',
                 badge.isEarned && styles
                   ? [styles.border, styles.bg]
                   : 'border-muted bg-muted/40',
                 !badge.isEarned && 'grayscale opacity-60'
               )}
             >
+              {/* Inner shadow for depth */}
+              <div className="absolute inset-0 rounded-full shadow-[inset_0_3px_5px_rgba(0,0,0,0.15)]" />
+
               {badge.isEarned && (
                 <div className="absolute top-0 left-0 w-full h-full">
-                    <div className="absolute -top-4 -left-8 w-24 h-12 bg-white/20 rounded-full rotate-45 blur-md" />
+                    {/* Subtle shine effect */}
+                    <div className="absolute top-1 left-2 w-16 h-8 bg-white/20 rounded-full rotate-45 blur-md" />
                 </div>
               )}
               <badge.icon
                 className={cn(
-                  'h-12 w-12 drop-shadow-lg',
+                  'h-12 w-12 drop-shadow-lg z-10',
                   badge.isEarned && styles
                     ? styles.icon
                     : 'text-muted-foreground'
