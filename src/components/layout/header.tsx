@@ -2,16 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  Bell,
-  Home,
-  Calendar,
-  Building,
-  Award,
-  PanelLeft,
-  Settings,
-  LogOut,
-} from 'lucide-react';
+import { Bell } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -22,13 +13,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-  SheetTitle,
-  SheetDescription,
-} from '@/components/ui/sheet';
 import {
   Popover,
   PopoverContent,
@@ -41,16 +25,8 @@ import { notifications, volunteer } from '@/lib/placeholder-data';
 import { cn } from '@/lib/utils';
 import { Logo } from '../shared/logo';
 
-const navLinks = [
-    { href: '/', label: 'Dashboard', icon: Home },
-    { href: '/events', label: 'Events', icon: Calendar },
-    { href: '/ngos', label: 'NGOs', icon: Building },
-    { href: '/dashboard/my-impact', label: 'My Badges', icon: Award },
-];
-
 export default function Header() {
     const { user, logout } = useAuth();
-    const pathname = usePathname();
     const volunteerAvatar = PlaceHolderImages.find(p => p.id === 'avatar-priya-sharma');
     const volunteerName = user?.name || volunteer.name;
 
@@ -59,53 +35,6 @@ export default function Header() {
     return (
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b bg-background/80 backdrop-blur-lg px-4 sm:px-6">
             <div className="flex items-center gap-4">
-              <Sheet>
-                  <SheetTrigger asChild>
-                      <Button variant="outline" size="icon" className="shrink-0 md:hidden">
-                          <PanelLeft className="h-5 w-5" />
-                          <span className="sr-only">Toggle navigation menu</span>
-                      </Button>
-                  </SheetTrigger>
-                  <SheetContent side="left" className="flex flex-col p-0">
-                      <SheetTitle className="sr-only">Menu</SheetTitle>
-                      <SheetDescription className="sr-only">Main navigation</SheetDescription>
-                      <div className="flex h-16 items-center border-b px-6">
-                          <Logo />
-                      </div>
-                      <nav className="grid gap-2 text-lg font-medium p-4">
-                          {navLinks.map((link) => {
-                              const isActive = link.href === '/' ? pathname === link.href : pathname.startsWith(link.href);
-                              return (
-                                  <Link
-                                      key={link.href}
-                                      href={link.href}
-                                      className={cn(
-                                          'flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground',
-                                          isActive && 'bg-accent text-accent-foreground'
-                                      )}
-                                  >
-                                      <link.icon className="h-5 w-5" />
-                                      {link.label}
-                                  </Link>
-                              );
-                          })}
-                      </nav>
-                      <div className="mt-auto p-4 border-t">
-                          <div className="grid gap-2">
-                              <Button variant="ghost" className="w-full justify-start" asChild>
-                                  <Link href="/settings">
-                                      <Settings className="mr-2 h-4 w-4" />
-                                      Settings
-                                  </Link>
-                              </Button>
-                              <Button variant="ghost" className="w-full justify-start" onClick={logout}>
-                                  <LogOut className="mr-2 h-4 w-4" />
-                                  Logout
-                              </Button>
-                          </div>
-                      </div>
-                  </SheetContent>
-              </Sheet>
               <div className='md:hidden'>
                   <Logo />
               </div>
@@ -126,8 +55,8 @@ export default function Header() {
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-80 md:w-96" align="end">
-                        <div className="grid gap-4 p-4">
-                            <div className="space-y-2">
+                        <div className="p-4">
+                            <div className="space-y-2 mb-4">
                                 <h4 className="font-medium leading-none">Notifications</h4>
                                 { unreadNotifications > 0 && <p className="text-sm text-muted-foreground">
                                     You have {unreadNotifications} unread messages.
@@ -154,7 +83,8 @@ export default function Header() {
                                     </div>
                                 ))}
                             </div>
-                            { notifications.length > 0 && <Button variant="outline" size="sm" className="w-full">Mark all as read</Button>}
+                            { notifications.length === 0 && <p className="text-sm text-muted-foreground text-center">No new notifications.</p> }
+                            { notifications.length > 0 && <Button variant="outline" size="sm" className="w-full mt-2">Mark all as read</Button>}
                         </div>
                     </PopoverContent>
                 </Popover>
