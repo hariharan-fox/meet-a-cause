@@ -44,12 +44,16 @@ export default function DashboardPage() {
         <Carousel
           plugins={[plugin.current]}
           className="w-full"
+          opts={{
+            align: "start",
+            loop: true,
+          }}
         >
           <CarouselContent>
             {carouselEvents.map((event) => {
               const eventImage = PlaceHolderImages.find(p => p.id === event.imageUrl);
               return (
-                <CarouselItem key={event.id}>
+                <CarouselItem key={event.id} className="lg:basis-1/2">
                   <Link href={`/events/${event.id}`}>
                     <div className="relative aspect-[16/7] w-full rounded-2xl overflow-hidden group">
                       {eventImage && (
