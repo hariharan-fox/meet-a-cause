@@ -31,7 +31,7 @@ export default function EventsPage() {
           onOpenChange={setIsOpen}
           className="mb-8"
         >
-          <div className="flex flex-col md:flex-row gap-4 items-center">
+          <div className="flex flex-row gap-4 items-center">
               <div className="relative flex-1 w-full">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input placeholder="Search events or skills..." className="pl-10" />
