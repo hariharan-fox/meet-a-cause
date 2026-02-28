@@ -2,13 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Calendar, Building, User, Award, Shield } from 'lucide-react';
+import { Home, Calendar, Building, User, Award } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
-import { Button } from '../ui/button';
 import { PanelLeft } from 'lucide-react';
 import { Logo } from '../shared/logo';
-import Sidebar from './sidebar';
 
 const mainNavLinks = [
     { href: '/', label: 'Dashboard', icon: Home },
@@ -20,7 +18,6 @@ const mainNavLinks = [
 const allNavLinks = [
     ...mainNavLinks,
     { href: '/settings', label: 'Profile', icon: User },
-    { href: '/admin/badges', label: 'Admin', icon: Shield },
 ]
 
 export default function BottomNav() {

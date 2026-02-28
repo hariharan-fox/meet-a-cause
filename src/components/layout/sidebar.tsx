@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Calendar, Building, Settings, LogOut, Award, Shield } from 'lucide-react';
+import { Home, Calendar, Building, Settings, LogOut, Award } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Logo } from '../shared/logo';
 import { Button } from '@/components/ui/button';
@@ -14,10 +14,6 @@ const navLinks = [
     { href: '/ngos', label: 'NGOs', icon: Building },
     { href: '/dashboard/my-impact', label: 'My Badges', icon: Award },
 ];
-
-const adminLinks = [
-    { href: '/admin/badges', label: 'Badge Admin', icon: Shield },
-]
 
 export default function Sidebar() {
     const pathname = usePathname();
@@ -48,27 +44,6 @@ export default function Sidebar() {
                             );
                         })}
                     </nav>
-                     <div className="my-4 px-2">
-                        <p className="px-3 py-2 text-xs font-semibold text-muted-foreground/60 uppercase">Admin</p>
-                        <nav className="grid items-start gap-1 text-sm font-medium">
-                           {adminLinks.map((link) => {
-                                const isActive = pathname.startsWith(link.href);
-                                return (
-                                    <Link
-                                        key={link.href}
-                                        href={link.href}
-                                        className={cn(
-                                            'flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-accent',
-                                            isActive && 'bg-accent text-primary font-semibold'
-                                        )}
-                                    >
-                                        <link.icon className="h-4 w-4" />
-                                        {link.label}
-                                    </Link>
-                                );
-                            })}
-                        </nav>
-                    </div>
                 </div>
                 <div className="mt-auto p-4 border-t">
                     <div className="grid gap-2">
