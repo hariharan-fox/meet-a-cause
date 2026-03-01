@@ -13,7 +13,7 @@ type User = {
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
-  signup: (name: string, email: string, password: string, role: 'volunteer' | 'ngo') => Promise<void>;
+  signup: (name: string, email: string, password: string, role: 'volunteer' | 'ngo', referrerId?: string | null) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -51,10 +51,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const signup = async (name: string, email: string, password: string, role: 'volunteer' | 'ngo') => {
+  const signup = async (name: string, email: string, password: string, role: 'volunteer' | 'ngo', referrerId?: string | null) => {
     // Mock API call
     return new Promise<void>((resolve) => {
       setTimeout(() => {
+        if (referrerId) {
+          console.log(`New user was referred by: ${referrerId}`);
+          // In a real app, you would save this association in your database.
+        }
         const newUser: User = { id: Date.now().toString(), name, email, role };
         setUser(newUser);
         localStorage.setItem('mockUser', JSON.stringify(newUser));
