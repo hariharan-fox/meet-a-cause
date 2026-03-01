@@ -46,6 +46,7 @@ export type Certificate = {
   rule: string;
   icon: any;
   isEarned: boolean;
+  category: string;
   level?: 'Bronze' | 'Silver' | 'Gold' | 'Platinum';
   shape?: 'circle' | 'pentagon' | 'hexagon';
 };
