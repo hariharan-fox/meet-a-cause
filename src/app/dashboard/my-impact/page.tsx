@@ -19,31 +19,36 @@ const Badge = ({ badge, size = 'medium' }: { badge: Certificate; size?: 'medium'
 
   const LEVEL_COLORS = {
     Bronze: {
-      bg: ["#fde68a", "#f59e0b"],
-      border: ["#fffbeb", "#fef3c7"],
-      text: "text-amber-900",
+      stops: ["#D9A66C", "#A67C49", "#D9A66C"],
+      highlight: "#F5D4A8",
+      text: "text-white",
+      shadow: "rgba(166, 124, 73, 0.4)",
     },
     Silver: {
-      bg: ["#e5e7eb", "#9ca3af"],
-      border: ["#f9fafb", "#e5e7eb"],
+      stops: ["#E0E0E0", "#BDBDBD", "#E0E0E0"],
+      highlight: "#FFFFFF",
       text: "text-gray-800",
+      shadow: "rgba(189, 189, 189, 0.4)",
     },
     Gold: {
-      bg: ["#facc15", "#d97706"],
-      border: ["#fefce8", "#fde047"],
+      stops: ["#FFDF80", "#FFC700", "#FFDF80"],
+      highlight: "#FFF0B3",
       text: "text-yellow-950",
+      shadow: "rgba(255, 199, 0, 0.4)",
     },
     Platinum: {
-      bg: ["#7dd3fc", "#0ea5e9"],
-      border: ["#f0f9ff", "#bae6fd"],
+      stops: ["#BDEBFF", "#87CEEB", "#BDEBFF"],
+      highlight: "#E6F7FF",
       text: "text-sky-950",
+      shadow: "rgba(135, 206, 235, 0.4)",
     },
   };
 
   const UnearnedColor = {
-    bg: ["#f3f4f6", "#e5e7eb"],
-    border: ["#f9fafb", "#f3f4f6"],
+    stops: ["#E5E7EB", "#D1D5DB", "#E5E7EB"],
+    highlight: "#F9FAFB",
     text: "text-gray-500",
+    shadow: "rgba(209, 213, 219, 0.4)",
   };
 
   const colors = badge.isEarned ? LEVEL_COLORS[badge.level || 'Bronze'] : UnearnedColor;
@@ -51,29 +56,43 @@ const Badge = ({ badge, size = 'medium' }: { badge: Certificate; size?: 'medium'
   const isLarge = size === 'large';
   
   const bgGradientId = `bg-gradient-${badge.id.replace(/[^a-zA-Z0-9-]/g, '')}`;
-  const borderGradientId = `border-gradient-${badge.id.replace(/[^a-zA-Z0-9-]/g, '')}`;
+  const highlightGradientId = `highlight-gradient-${badge.id.replace(/[^a-zA-Z0-9-]/g, '')}`;
+  const filterId = `filter-${badge.id.replace(/[^a-zA-Z0-9-]/g, '')}`;
 
   return (
     <div className={cn("relative group", isLarge ? "w-40 h-40" : "w-24 h-24", badge.isEarned && 'cursor-pointer' )}>
-        <svg viewBox="0 0 100 100" className={cn("absolute inset-0 w-full h-full drop-shadow-md", !badge.isEarned && "saturate-0 opacity-70")}>
+        <svg viewBox="0 0 100 100" className={cn("absolute inset-0 w-full h-full", !badge.isEarned && "saturate-0 opacity-70")}>
             <defs>
-                <linearGradient id={borderGradientId} x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" style={{ stopColor: colors.border[0] }} />
-                    <stop offset="100%" style={{ stopColor: colors.border[1] }} />
+                <linearGradient id={bgGradientId} x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor={colors.stops[0]} />
+                    <stop offset="50%" stopColor={colors.stops[1]} />
+                    <stop offset="100%" stopColor={colors.stops[2]} />
                 </linearGradient>
-                 <linearGradient id={bgGradientId} x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" style={{ stopColor: colors.bg[0] }} />
-                    <stop offset="100%" style={{ stopColor: colors.bg[1] }} />
-                </linearGradient>
+                <radialGradient id={highlightGradientId} cx="50%" cy="0%" r="75%">
+                    <stop offset="0%" stopColor={colors.highlight} stopOpacity="0.6"/>
+                    <stop offset="100%" stopColor={colors.highlight} stopOpacity="0"/>
+                </radialGradient>
+                <filter id={filterId} x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy={isLarge ? "4" : "2"} stdDeviation={isLarge ? "3" : "2"} floodColor={colors.shadow} />
+                </filter>
             </defs>
             
-            <path d={SHAPE_PATHS[shape]} fill={`url(#${borderGradientId})`} />
-            <path d={SHAPE_PATHS[shape]} fill={`url(#${bgGradientId})`} transform="translate(8, 8) scale(0.84)" />
+            <g style={{ filter: `url(#${filterId})` }}>
+              <path d={SHAPE_PATHS[shape]} fill={`url(#${bgGradientId})`} />
+              <path d={SHAPE_PATHS[shape]} fill={`url(#${highlightGradientId})`} />
+              <path d={SHAPE_PATHS[shape]} fill="transparent" stroke={colors.stops[1]} strokeWidth="1" />
+            </g>
         </svg>
         
         <div className={cn("relative z-10 flex flex-col items-center justify-center w-full h-full p-2", colors.text)}>
-            <badge.icon className={cn(isLarge ? "w-16 h-16" : "w-9 h-9")} />
-            <span className={cn("font-bold drop-shadow-sm", isLarge ? "text-3xl mt-2" : "text-lg mt-1")}>
+            <badge.icon 
+              className={cn(isLarge ? "w-16 h-16" : "w-9 h-9")} 
+              style={{ filter: `drop-shadow(0px 1px 1px rgba(0,0,0,0.2))`}}
+            />
+            <span 
+              className={cn("font-bold", isLarge ? "text-3xl mt-2" : "text-lg mt-1")}
+              style={{ textShadow: '0px 1px 2px rgba(0,0,0,0.2)' }}
+            >
               {badge.description.match(/\d+/)?.[0] || ''}
             </span>
         </div>
@@ -91,8 +110,10 @@ export default function BadgesPage() {
   const unearnedBadges = allCertificates.filter((c) => !c.isEarned);
   
   const handleBadgeClick = (badge: Certificate) => {
-    setSelectedBadge(badge);
-    setDetailDialogOpen(true);
+    if (badge.isEarned) { // only earned badges open dialog
+        setSelectedBadge(badge);
+        setDetailDialogOpen(true);
+    }
   };
 
   const copyToClipboard = () => {
@@ -107,10 +128,10 @@ export default function BadgesPage() {
   };
   
   const LEVEL_BG_COLORS = {
-    Bronze: "from-amber-100 to-amber-200",
-    Silver: "from-slate-100 to-slate-200",
-    Gold: "from-yellow-100 to-yellow-200",
-    Platinum: "from-sky-100 to-sky-200",
+    Bronze: "from-amber-600/20 via-amber-800/10 to-card",
+    Silver: "from-slate-400/20 via-slate-500/10 to-card",
+    Gold: "from-yellow-400/20 via-yellow-500/10 to-card",
+    Platinum: "from-sky-400/20 via-sky-500/10 to-card",
   };
   const UnearnedBgColor = "from-gray-100 to-gray-200";
   const bgGradient = selectedBadge?.isEarned ? LEVEL_BG_COLORS[selectedBadge.level || 'Bronze'] : UnearnedBgColor;
@@ -121,7 +142,7 @@ export default function BadgesPage() {
         <Tooltip delayDuration={100}>
           <TooltipTrigger
             onClick={() => handleBadgeClick(badge)}
-            className="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg transition-transform hover:scale-110"
+            className={cn("focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg transition-transform hover:scale-110", badge.isEarned ? "cursor-pointer" : "cursor-default")}
           >
             <div className="flex flex-col items-center w-28 text-center">
               <Badge badge={badge} />
