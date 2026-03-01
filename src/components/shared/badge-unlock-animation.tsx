@@ -46,7 +46,7 @@ export default function BadgeUnlockAnimation({ badge, onClose }: { badge: Certif
         </div>
 
         <div className="p-6 pt-4 space-y-3">
-          <p className="text-sm font-semibold uppercase tracking-widest text-primary">New Achievement Unlocked!</p>
+          <p className="text-sm font-semibold uppercase tracking-wider text-primary">New Achievement Unlocked!</p>
           <h3 className="text-xl font-bold">{badge.name} {badge.level && `(${badge.level})`}</h3>
           <p className="text-muted-foreground text-sm">{badge.description}</p>
         </div>
