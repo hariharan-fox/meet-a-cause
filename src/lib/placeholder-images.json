@@ -83,30 +83,6 @@
       "description": "Logo for Animal Allies.",
       "imageUrl": "https://images.unsplash.com/photo-1654362595375-2e775cb111df?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwYXclMjBsb2dvfGVufDB8fHx8MTc2ODYyNTY2Mnww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "paw logo"
-    },
-    {
-      "id": "avatar-arjun-mehra",
-      "description": "Avatar for Arjun Mehra.",
-      "imageUrl": "https://images.unsplash.com/photo-1599566150163-29194dcaad36?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3Njg3MjAxMDR8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "man portrait"
-    },
-    {
-      "id": "avatar-sunita-patel",
-      "description": "Avatar for Sunita Patel.",
-      "imageUrl": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3Njg3MjAxMDR8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "woman portrait"
-    },
-    {
-      "id": "avatar-vikram-singh",
-      "description": "Avatar for Vikram Singh.",
-      "imageUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3Njg3MjAxMDR8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "man smiling"
-    },
-    {
-      "id": "avatar-aisha-khan",
-      "description": "Avatar for Aisha Khan.",
-      "imageUrl": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3Njg3MjAxMDR8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "woman smiling"
     }
   ]
 }

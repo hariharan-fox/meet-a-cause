@@ -1,4 +1,4 @@
-import type { Volunteer, Event, NGO, Testimonial, Certificate, Notification, LeaderboardEntry } from './types';
+import type { Volunteer, Event, NGO, Testimonial, Certificate, Notification } from './types';
 import { BookOpen, Sprout, HeartPulse, Users, ShieldCheck, Rocket, Star, Heart, Medal, Trophy, Gem, Crown, Zap, TrendingUp, Award, UserPlus } from 'lucide-react';
 
 export const volunteer: Volunteer = {
@@ -282,57 +282,4 @@ export const testimonials: Testimonial[] = [
     role: 'Volunteer',
     avatarId: 'avatar-priya-sharma'
   }
-];
-
-export const leaderboardData: LeaderboardEntry[] = [
-  {
-    rank: 1,
-    volunteer: {
-      id: 'vol-2',
-      name: 'Arjun Mehra',
-      avatarUrl: 'avatar-arjun-mehra'
-    },
-    hoursLogged: 152,
-    eventsCompleted: 12,
-  },
-  {
-    rank: 2,
-    volunteer: {
-      id: 'vol-1',
-      name: 'Priya Sharma',
-      avatarUrl: 'avatar-priya-sharma',
-    },
-    hoursLogged: 138,
-    eventsCompleted: 9,
-  },
-  {
-    rank: 3,
-    volunteer: {
-      id: 'vol-3',
-      name: 'Sunita Patel',
-      avatarUrl: 'avatar-sunita-patel'
-    },
-    hoursLogged: 121,
-    eventsCompleted: 15,
-  },
-    {
-    rank: 4,
-    volunteer: {
-      id: 'vol-4',
-      name: 'Vikram Singh',
-      avatarUrl: 'avatar-vikram-singh'
-    },
-    hoursLogged: 105,
-    eventsCompleted: 7,
-  },
-  {
-    rank: 5,
-    volunteer: {
-      id: 'vol-5',
-      name: 'Aisha Khan',
-      avatarUrl: 'avatar-aisha-khan'
-    },
-    hoursLogged: 98,
-    eventsCompleted: 11,
-  },
 ];

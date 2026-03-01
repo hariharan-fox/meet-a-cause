@@ -58,14 +58,3 @@ export type Notification = {
   createdAt: string;
   isRead: boolean;
 };
-
-export type LeaderboardEntry = {
-  rank: number;
-  volunteer: {
-    id: string;
-    name: string;
-    avatarUrl: string;
-  };
-  hoursLogged: number;
-  eventsCompleted: number;
-};
