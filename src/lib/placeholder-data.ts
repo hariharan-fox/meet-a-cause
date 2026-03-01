@@ -1,4 +1,4 @@
-import type { Volunteer, Event, NGO, Testimonial, Certificate, Notification } from './types';
+import type { Volunteer, Event, NGO, Testimonial, Certificate, Notification, Post } from './types';
 import { BookOpen, Sprout, HeartPulse, Users, ShieldCheck, Rocket, Star, Heart, Medal, Trophy, Gem, Crown, Zap, TrendingUp, Award, UserPlus } from 'lucide-react';
 
 export const volunteer: Volunteer = {
@@ -245,6 +245,39 @@ export const notifications: Notification[] = [
     description: 'Thank you for joining our community of volunteers.',
     createdAt: '1 week ago',
     isRead: true,
+  },
+];
+
+export const allPosts: Post[] = [
+  {
+    id: 'post-1',
+    title: 'The Ripple Effect: How Your Volunteer Hour Creates Community-Wide Impact',
+    excerpt: 'Ever wonder how one hour of your time can possibly make a dent in big world problems? We break down the incredible chain reaction of a single volunteer action, from a shared smile to a stronger community.',
+    imageUrl: 'blog-community-impact',
+    author: 'Priya Sharma',
+    authorAvatarUrl: 'avatar-priya-sharma',
+    date: 'December 1, 2024',
+    readingTime: 5,
+  },
+  {
+    id: 'post-2',
+    title: 'Finding Your Purpose: Matching Your Passions with the Right Cause',
+    excerpt: 'Volunteering is most rewarding when it aligns with what you truly care about. This guide will help you explore your passions and connect with an NGO that feels like the perfect fit.',
+    imageUrl: 'blog-finding-purpose',
+    author: 'Alex Chen',
+    authorAvatarUrl: 'avatar-alex-chen',
+    date: 'November 25, 2024',
+    readingTime: 7,
+  },
+    {
+    id: 'post-3',
+    title: 'Tech for Good: How We Built Just Hands and Our Vision for the Future',
+    excerpt: 'A behind-the-scenes look at the technology and the mission driving our platform. Learn about our tech stack, our challenges, and how we plan to empower even more volunteers and NGOs.',
+    imageUrl: 'blog-tech-for-good',
+    author: 'The Just Hands Team',
+    authorAvatarUrl: 'ngo-tech-forward',
+    date: 'November 18, 2024',
+    readingTime: 6,
   },
 ];
 

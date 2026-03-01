@@ -88,6 +88,7 @@ export default function Header() {
              <nav className="hidden items-center gap-2 md:flex">
                 <Button variant="ghost" asChild><Link href="/events">Events</Link></Button>
                 <Button variant="ghost" asChild><Link href="/ngos">NGOs</Link></Button>
+                <Button variant="ghost" asChild><Link href="/blog">Blog</Link></Button>
                 <Button variant="ghost" asChild><Link href="/login">Login</Link></Button>
                 <Button asChild><Link href="/signup">Sign Up</Link></Button>
              </nav>
@@ -109,6 +110,7 @@ export default function Header() {
                     <nav className="grid gap-4 text-base p-4">
                         <Link href="/events" className="text-muted-foreground hover:text-foreground">Events</Link>
                         <Link href="/ngos" className="text-muted-foreground hover:text-foreground">NGOs</Link>
+                        <Link href="/blog" className="text-muted-foreground hover:text-foreground">Blog</Link>
                     </nav>
                     <div className="mt-auto p-4 space-y-4 border-t">
                         <Button asChild variant="outline" className="w-full"><Link href="/login">Login</Link></Button>
