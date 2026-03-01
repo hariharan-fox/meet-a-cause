@@ -14,7 +14,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     const { user, isLoading } = useAuth();
 
     const isAuthPage = pathname?.startsWith('/login') || pathname?.startsWith('/signup');
-    const isPublicPage = isAuthPage || pathname?.startsWith('/events') || pathname?.startsWith('/ngos') || pathname?.startsWith('/blog');
+    const isPublicPage = isAuthPage || pathname?.startsWith('/events') || pathname?.startsWith('/ngos');
 
     useEffect(() => {
         if (isLoading) return;

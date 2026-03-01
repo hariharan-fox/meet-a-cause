@@ -83,30 +83,6 @@
       "description": "Logo for Animal Allies.",
       "imageUrl": "https://images.unsplash.com/photo-1654362595375-2e775cb111df?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwYXclMjBsb2dvfGVufDB8fHx8MTc2ODYyNTY2Mnww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "paw logo"
-    },
-    {
-      "id": "blog-community-impact",
-      "description": "Volunteers celebrating together.",
-      "imageUrl": "https://images.unsplash.com/photo-1531063233962-d2d2a4b8f562?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHx2b2x1bnRlZXJzJTIwY2VsZWJyYXRpbmd8ZW58MHx8fHwxNzY4NjExNzA1fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "volunteers celebrating"
-    },
-    {
-      "id": "blog-finding-purpose",
-      "description": "A person looking out at a sunrise.",
-      "imageUrl": "https://images.unsplash.com/photo-1470240731273-7821a6e23589?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzdW5yaXNlJTIwcHVycG9zZXxlbnwwfHx8fDE3Njg2MTE3MDV8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "sunrise purpose"
-    },
-    {
-      "id": "blog-tech-for-good",
-      "description": "A person using a laptop with code on the screen and a plant nearby.",
-      "imageUrl": "https://images.unsplash.com/photo-1618422168178-805c885b6b77?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHx0ZWNoJTIwZm9yJTIwZ29vZHxlbnwwfHx8fDE3Njg2MTE3MDV8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "tech good"
-    },
-    {
-      "id": "avatar-alex-chen",
-      "description": "Avatar for Alex Chen.",
-      "imageUrl": "https://images.unsplash.com/photo-1599566150163-29194dcaad36?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3Njg2MTE3MDV8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "person portrait"
     }
   ]
 }
