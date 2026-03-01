@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import type { Certificate } from '@/lib/types';
 
-export const BadgeVisual = ({ badge, size = 'medium', shine = 'none' }: { badge: Certificate; size?: 'medium' | 'large', shine?: 'none' | 'animate' }) => {
+export const BadgeVisual = ({ badge, size = 'medium' }: { badge: Certificate; size?: 'medium' | 'large' }) => {
   const SHAPE_PATHS = {
     circle: "M 50, 50 m -48, 0 a 48,48 0 1,0 96,0 a 48,48 0 1,0 -96,0",
     pentagon: "M 50,2 L 98,35 L 80,98 L 20,98 L 2,35 Z",
@@ -28,15 +28,11 @@ export const BadgeVisual = ({ badge, size = 'medium', shine = 'none' }: { badge:
   const bgGradientId = `bg-gradient-${badge.id.replace(/[^a-zA-Z0-9-]/g, '')}`;
   const highlightGradientId = `highlight-gradient-${badge.id.replace(/[^a-zA-Z0-9-]/g, '')}`;
   const filterId = `filter-${badge.id.replace(/[^a-zA-Z0-9-]/g, '')}`;
-  const clipPathId = `badge-clip-${badge.id.replace(/[^a-zA-Z0-9-]/g, '')}`;
 
   return (
     <div className={cn("relative group", sizeClasses, !badge.isEarned && "saturate-0 opacity-70")}>
         <svg viewBox="0 0 100 100" className={cn("absolute inset-0 w-full h-full")}>
             <defs>
-                <clipPath id={clipPathId}>
-                  <path d={SHAPE_PATHS[shape]} />
-                </clipPath>
                 <linearGradient id={bgGradientId} x1="0%" y1="0%" x2="0%" y2="100%">
                     <stop offset="0%" stopColor={colors.stops[0]} />
                     <stop offset="50%" stopColor={colors.stops[1]} />
@@ -71,11 +67,6 @@ export const BadgeVisual = ({ badge, size = 'medium', shine = 'none' }: { badge:
               {badge.description.match(/\d+/)?.[0] || ''}
             </span>
         </div>
-        {shine === 'animate' && (
-          <div className="absolute inset-0" style={{ clipPath: `url(#${clipPathId})` }}>
-            <div className="absolute -top-2 -left-12 h-32 w-64 bg-white/20 transform -rotate-45 animate-shine opacity-50" />
-          </div>
-        )}
     </div>
   );
 };

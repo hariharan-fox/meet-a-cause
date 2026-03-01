@@ -42,11 +42,11 @@ export default function BadgeUnlockAnimation({ badge, onClose }: { badge: Certif
         </Button>
 
         <div className={cn("relative p-8 pt-12 flex flex-col items-center bg-gradient-to-b", bgGradient)}>
-           <BadgeVisual badge={{ ...badge, isEarned: true }} size="large" shine="animate" />
+           <BadgeVisual badge={{ ...badge, isEarned: true }} size="large" />
         </div>
 
         <div className="p-6 pt-4 space-y-3">
-          <p className="text-sm font-semibold uppercase tracking-wider text-primary">New Achievement Unlocked!</p>
+          <p className="text-sm font-semibold uppercase tracking-wide text-primary">New Achievement Unlocked!</p>
           <h3 className="text-xl font-bold">{badge.name} {badge.level && `(${badge.level})`}</h3>
           <p className="text-muted-foreground text-sm">{badge.description}</p>
         </div>

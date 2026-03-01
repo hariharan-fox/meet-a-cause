@@ -21,7 +21,7 @@ const BadgeDisplay = ({ badge, onClick }: { badge: Certificate; onClick: (badge:
           className={cn("focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg transition-transform hover:scale-110", badge.isEarned ? "cursor-pointer" : "cursor-default")}
         >
           <div className="flex flex-col items-center w-full text-center">
-            <BadgeVisual badge={badge} shine={badge.isEarned ? 'animate' : 'none'} />
+            <BadgeVisual badge={badge} />
             <p className="text-xs font-semibold mt-2 h-8">{badge.name}</p>
           </div>
         </TooltipTrigger>
