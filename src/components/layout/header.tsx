@@ -83,6 +83,7 @@ export default function Header() {
              </div>
              <div className="flex items-center gap-2">
                 <Button variant="ghost" asChild><Link href="/events">Events</Link></Button>
+                <Button variant="ghost" asChild><Link href="/ngos">NGOs</Link></Button>
                 <Button variant="ghost" asChild><Link href="/login">Login</Link></Button>
                 <Button asChild><Link href="/signup">Sign Up</Link></Button>
              </div>
