@@ -31,9 +31,9 @@ const Badge = ({ badge, size = 'medium' }: { badge: Certificate; size?: 'medium'
   const shape = badge.shape || 'circle';
 
   const isLarge = size === 'large';
-  const sizeClasses = isLarge ? "w-40 h-40" : "w-20 h-20 md:w-24 md:h-24";
-  const iconSizeClasses = isLarge ? "w-16 h-16" : "w-8 h-8 md:w-10 md:h-10";
-  const textSizeClasses = isLarge ? "text-3xl mt-2" : "text-base mt-1";
+  const sizeClasses = isLarge ? "w-40 h-40" : "w-16 h-16 md:w-20 md:h-20";
+  const iconSizeClasses = isLarge ? "w-16 h-16" : "w-7 h-7 md:w-9 md:h-9";
+  const textSizeClasses = isLarge ? "text-3xl mt-2" : "text-sm mt-1";
   
   const bgGradientId = `bg-gradient-${badge.id.replace(/[^a-zA-Z0-9-]/g, '')}`;
   const highlightGradientId = `highlight-gradient-${badge.id.replace(/[^a-zA-Z0-9-]/g, '')}`;
