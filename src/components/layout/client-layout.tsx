@@ -14,7 +14,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     const { user, isLoading } = useAuth();
 
     const isAuthPage = pathname?.startsWith('/login') || pathname?.startsWith('/signup');
-    const isPublicPage = isAuthPage || pathname?.startsWith('/events') || pathname?.startsWith('/ngos');
+    const isPublicPage = isAuthPage || pathname?.startsWith('/events') || pathname?.startsWith('/ngos') || pathname?.startsWith('/waitlist');
 
     useEffect(() => {
         if (isLoading) return;
@@ -48,7 +48,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     }
     
     // Public layout for unauthenticated users
-    if (isAuthPage) {
+    if (isAuthPage || pathname?.startsWith('/waitlist')) {
         return (
             <div className="flex flex-col min-h-screen">
                 <Header />
