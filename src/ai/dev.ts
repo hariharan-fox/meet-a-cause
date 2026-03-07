@@ -1,4 +1,4 @@
 import { config } from 'dotenv';
 config();
 
-import '@/ai/flows/recommend-events-based-on-skills.ts';
+// AI flows will be imported here.
