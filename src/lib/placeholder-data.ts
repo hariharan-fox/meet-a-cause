@@ -265,16 +265,16 @@ export const howItWorks = [
 
 export const testimonials: Testimonial[] = [
   {
-    quote: 'ConnectSphere made it so easy to find a cause I\'m passionate about. I\'ve met amazing people and feel like I\'m truly making a difference in my local community.',
-    name: 'Jane Doe',
+    quote: 'Meet A Cause made it so easy to find a cause I\'m passionate about. I\'ve met amazing people and feel like I\'m truly making a difference in my local community.',
+    name: 'Ananya Rao',
     role: 'Volunteer',
-    avatarId: 'avatar-jane-doe'
+    avatarId: 'avatar-ananya-rao'
   },
   {
     quote: 'As a small NGO, finding dedicated volunteers was always a challenge. This platform has connected us with a pool of skilled and enthusiastic individuals. It\'s been a game-changer!',
-    name: 'John Smith',
+    name: 'Rohan Mehta',
     role: 'Director, Hope Helpers',
-    avatarId: 'avatar-john-smith'
+    avatarId: 'avatar-rohan-mehta'
   },
   {
     quote: 'The dashboard is fantastic for tracking my hours and seeing my volunteering history all in one place. It keeps me motivated to do more!',

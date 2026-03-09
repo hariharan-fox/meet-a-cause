@@ -43,16 +43,16 @@
       "imageHint": "mentorship session"
     },
     {
-      "id": "avatar-jane-doe",
-      "description": "Avatar for Jane Doe.",
-      "imageUrl": "https://images.unsplash.com/photo-1580489944761-15a19d654956?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx3b21hbiUyMHBvcnRyYWl0fGVufDB8fHx8MTc2ODU1NDczMnww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "woman portrait"
+      "id": "avatar-ananya-rao",
+      "description": "Avatar for Ananya Rao.",
+      "imageUrl": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxpbmRpYW4lMjB3b21hbiUyMHBvcnRyYWl0fGVufDB8fHx8MTc2ODc5MjM0OXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "indian woman"
     },
     {
-      "id": "avatar-john-smith",
-      "description": "Avatar for John Smith.",
-      "imageUrl": "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxtYW4lMjBwb3J0cmFpdHxlbnwwfHx8fDE3Njg1NzI1MTV8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "man portrait"
+      "id": "avatar-rohan-mehta",
+      "description": "Avatar for Rohan Mehta.",
+      "imageUrl": "https://images.unsplash.com/photo-1615109398623-88346a601842?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxpbmRpYW4lMjBtYW4lMjBwb3J0cmFpdHxlbnwwfHx8fDE3Njg3OTI0MTB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "indian man"
     },
     {
       "id": "avatar-priya-sharma",
