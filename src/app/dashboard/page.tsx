@@ -35,7 +35,7 @@ export default function DashboardPage() {
             </Avatar>
         )}
         <div>
-          <h1 className="text-lg md:text-xl font-bold">Welcome back, {volunteer.name}!</h1>
+          <h1 className="text-lg md:text-xl font-bold">Welcome back, {volunteer.name.split(' ')[0]}!</h1>
         </div>
       </div>
 
