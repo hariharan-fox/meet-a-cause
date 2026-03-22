@@ -99,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 if ((user.skills?.length || 0) > 0 && (user.interests?.length || 0) > 0) isUnlocked = true;
                 break;
             case 'start-4':
-                if (user.auth.phoneNumber) isUnlocked = true;
+                if (user.phoneNumber) isUnlocked = true;
                 break;
             case 'event-2': if (user.completedEventIds.length >= 5) isUnlocked = true; break;
             case 'event-3': if (user.completedEventIds.length >= 15) isUnlocked = true; break;
@@ -184,7 +184,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Check for badges BEFORE updating firestore
     const badgeUpdates = await checkAndUnlockBadges({ ...newProfileState, auth: firebaseUser });
 
-    const finalProfileData = badgeUpdates ? { ...newProfileState, ...badgeUpdates } : newProfileState;
+    const finalProfileData = badgeUpdates ? { ...updatedData, ...badgeUpdates } : updatedData;
 
     await updateDoc(profileRef, finalProfileData);
   };

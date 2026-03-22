@@ -28,6 +28,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAuth as useFirebaseAuth } from "@/firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber, PhoneAuthProvider, linkWithCredential, ConfirmationResult } from "firebase/auth";
 
+declare global {
+  interface Window {
+    recaptchaVerifier?: RecaptchaVerifier;
+  }
+}
+
 export default function SettingsPage() {
   const { user, logout, changePassword, deleteAccount, updateUser } = useAuth();
   const firebaseAuth = useFirebaseAuth();
@@ -74,19 +80,8 @@ export default function SettingsPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteReason, setDeleteReason] = useState("");
 
-  // Phone Verification Logic
-  useEffect(() => {
-    if (!firebaseAuth) return;
-    window.recaptchaVerifier = new RecaptchaVerifier(firebaseAuth, 'recaptcha-container', {
-      'size': 'invisible',
-    });
-    return () => {
-      window.recaptchaVerifier?.clear();
-    }
-  }, [firebaseAuth]);
-
   const handleSendOtp = async () => {
-    if (!phone) {
+    if (!phone || !firebaseAuth) {
       setPhoneError('Please enter a phone number.');
       return;
     }
@@ -95,7 +90,9 @@ export default function SettingsPage() {
     setPhoneError(null);
     setIsSendingOtp(true);
     try {
-      const verifier = window.recaptchaVerifier;
+      const verifier = new RecaptchaVerifier(firebaseAuth, 'recaptcha-container', {
+        'size': 'invisible',
+      });
       const result = await signInWithPhoneNumber(firebaseAuth, phoneNumber, verifier);
       setConfirmationResult(result);
       toast({ title: "OTP Sent!", description: `An OTP has been sent to ${phoneNumber}.` });
@@ -104,6 +101,8 @@ export default function SettingsPage() {
       let message = 'Failed to send OTP. Please try again.';
       if (error.code === 'auth/invalid-phone-number') {
         message = 'The phone number is not valid.';
+      } else if (error.code === 'auth/too-many-requests') {
+        message = 'You have sent too many OTP requests. Please try again later.';
       }
       setPhoneError(message);
     } finally {
@@ -126,7 +125,13 @@ export default function SettingsPage() {
       const credential = PhoneAuthProvider.credential(confirmationResult.verificationId, otp);
       if (user?.auth) {
         await linkWithCredential(user.auth, credential);
-        await updateUser({ phoneNumber: user.auth.phoneNumber });
+        // After linking, Firebase automatically updates the user object.
+        // We fetch the latest phone number and update our firestore profile.
+        const updatedUser = firebaseAuth.currentUser;
+        if (updatedUser?.phoneNumber) {
+            await updateUser({ phoneNumber: updatedUser.phoneNumber });
+        }
+        
         toast({ title: "Phone Number Verified!", description: "Your phone number has been successfully linked to your account." });
         setConfirmationResult(null);
         setOtp('');
@@ -306,10 +311,10 @@ export default function SettingsPage() {
                 <CardDescription>Verify your phone number to unlock the "Communicator" badge and enhance account security.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                {user.auth.phoneNumber ? (
+                {user.phoneNumber ? (
                     <div className="flex items-center gap-2 text-green-600 font-medium p-3 bg-green-50 rounded-md border border-green-200">
                         <ShieldCheck className="h-5 w-5" />
-                        <span>Verified: {user.auth.phoneNumber}</span>
+                        <span>Verified: {user.phoneNumber}</span>
                     </div>
                 ) : (
                     <div className="space-y-4">
