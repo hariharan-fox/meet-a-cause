@@ -5,9 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { volunteer, completedEvents } from "@/lib/placeholder-data";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { useAuth } from "@/lib/auth-context";
 import { LogOut, ArrowRight, Gift, Copy } from "lucide-react";
 import Link from "next/link";
@@ -16,9 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 export default function SettingsPage() {
   const { user, logout } = useAuth();
   const { toast } = useToast();
-  const volunteerAvatar = PlaceHolderImages.find(p => p.id === 'avatar-priya-sharma');
-  const volunteerName = user?.name || volunteer.name;
-  const volunteerEmail = user?.email || volunteer.email;
+  
   const referralLink = `https://meet-a-cause.app/signup?ref=${user?.id || 'volunteer123'}`;
 
   const handleCopy = () => {
@@ -50,21 +46,18 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex items-center gap-4">
-              {volunteerAvatar && (
-                  <Avatar className="h-20 w-20">
-                    <AvatarImage src={volunteerAvatar.imageUrl} alt={volunteerName} data-ai-hint={volunteerAvatar.imageHint} />
-                    <AvatarFallback>{volunteerName.charAt(0)}</AvatarFallback>
-                  </Avatar>
-              )}
+              <Avatar className="h-20 w-20">
+                <AvatarFallback>{user?.name?.charAt(0) || 'V'}</AvatarFallback>
+              </Avatar>
               <Button variant="outline" onClick={() => showComingSoonToast('Changing your photo')}>Change Photo</Button>
             </div>
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
-              <Input id="name" defaultValue={volunteerName} />
+              <Input id="name" defaultValue={user?.name || ''} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" defaultValue={volunteerEmail} disabled />
+              <Input id="email" type="email" defaultValue={user?.email || ''} disabled />
               <p className="text-xs text-muted-foreground">Your email address is not displayed publicly.</p>
             </div>
             <Button onClick={() => showComingSoonToast('Updating your profile')}>Update Profile</Button>
@@ -103,36 +96,7 @@ export default function SettingsPage() {
           <Card>
             <CardContent className="p-0">
               <ul className="divide-y">
-                {completedEvents.length > 0 ? (
-                  completedEvents.map((event) => {
-                    const eventImage = PlaceHolderImages.find(p => p.id === event.imageUrl);
-                    return (
-                      <li key={event.id} className="p-4">
-                        <div className="flex items-center justify-between gap-4 flex-wrap">
-                          <div className="flex items-center gap-4">
-                            {eventImage && (
-                              <Avatar className="h-12 w-12 rounded-md">
-                                <AvatarImage src={eventImage.imageUrl} alt={event.title} className="rounded-md" data-ai-hint={eventImage.imageHint} />
-                                <AvatarFallback className="rounded-md">{event.title.charAt(0)}</AvatarFallback>
-                              </Avatar>
-                            )}
-                            <div>
-                              <p className="font-semibold text-sm">{event.title}</p>
-                              <p className="text-xs text-muted-foreground">{event.date}</p>
-                            </div>
-                          </div>
-                          <Button asChild variant="outline" size="sm">
-                            <Link href={`/events/${event.id}`}>
-                              View Impact <ArrowRight className="ml-2 h-3 w-3" />
-                            </Link>
-                          </Button>
-                        </div>
-                      </li>
-                    );
-                  })
-                ) : (
                   <p className="text-muted-foreground text-sm p-6 text-center">You haven't completed any events yet.</p>
-                )}
               </ul>
             </CardContent>
           </Card>

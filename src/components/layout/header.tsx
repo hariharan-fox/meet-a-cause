@@ -15,16 +15,13 @@ import {
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/lib/auth-context';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { notifications, volunteer } from '@/lib/placeholder-data';
+import { notifications } from '@/lib/placeholder-data';
 import { Logo } from '../shared/logo';
 
 export default function Header() {
     const { user, logout } = useAuth();
 
     if (user) {
-        const volunteerAvatar = PlaceHolderImages.find(p => p.id === 'avatar-priya-sharma');
-        const volunteerName = user?.name || volunteer.name;
         const unreadNotifications = notifications.filter(n => !n.isRead).length;
         
         return (
@@ -50,17 +47,14 @@ export default function Header() {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon" className="rounded-full">
-                                {volunteerAvatar && (
-                                    <Avatar className="h-8 w-8">
-                                        <AvatarImage src={volunteerAvatar.imageUrl} alt={volunteerName} data-ai-hint={volunteerAvatar.imageHint} />
-                                        <AvatarFallback>{volunteerName.charAt(0)}</AvatarFallback>
-                                    </Avatar>
-                                )}
+                                <Avatar className="h-8 w-8">
+                                    <AvatarFallback>{user?.name?.charAt(0) || 'V'}</AvatarFallback>
+                                </Avatar>
                                 <span className="sr-only">Toggle user menu</span>
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>{volunteerName}</DropdownMenuLabel>
+                            <DropdownMenuLabel>{user.name}</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem asChild>
                               <Link href="/settings">Settings</Link>

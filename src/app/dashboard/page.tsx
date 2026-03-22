@@ -10,15 +10,17 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import { CheckCircle, Clock, Award, Users, ArrowRight } from 'lucide-react';
 
-import { volunteer, featuredEvents, featuredNgos, upcomingCommitments, allEvents } from '@/lib/placeholder-data';
+import { featuredEvents, featuredNgos, allEvents } from '@/lib/placeholder-data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import type { Event } from '@/lib/types';
 import EventCard from '@/components/shared/event-card';
 import NgoCard from '@/components/shared/ngo-card';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/lib/auth-context';
 
 export default function DashboardPage() {
-  const volunteerAvatar = PlaceHolderImages.find(p => p.id === 'avatar-priya-sharma');
+  const { user } = useAuth();
+  
   const plugin = useRef(
     Autoplay({ delay: 5000, stopOnInteraction: false, stopOnMouseEnter: true })
   );
@@ -28,14 +30,11 @@ export default function DashboardPage() {
   return (
     <div className="container mx-auto px-4 md:px-6 py-8 space-y-12">
       <div className="flex items-center gap-4">
-        {volunteerAvatar && (
-            <Avatar className="h-12 w-12 md:h-16 md:w-16">
-              <AvatarImage src={volunteerAvatar.imageUrl} alt={volunteer.name} data-ai-hint={volunteerAvatar.imageHint} />
-              <AvatarFallback>{volunteer.name.charAt(0)}</AvatarFallback>
-            </Avatar>
-        )}
+        <Avatar className="h-12 w-12 md:h-16 md:w-16">
+          <AvatarFallback>{user?.name?.charAt(0) || 'V'}</AvatarFallback>
+        </Avatar>
         <div>
-          <h1 className="text-lg md:text-xl font-bold">Welcome back, {volunteer.name.split(' ')[0]}!</h1>
+          <h1 className="text-lg md:text-xl font-bold">Welcome back, {user?.name?.split(' ')[0]}!</h1>
         </div>
       </div>
 
@@ -88,8 +87,8 @@ export default function DashboardPage() {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-lg font-bold">42</div>
-            <p className="text-xs text-muted-foreground">in the last 3 months</p>
+            <div className="text-lg font-bold">0</div>
+            <p className="text-xs text-muted-foreground">Your journey begins!</p>
           </CardContent>
         </Card>
         <Card>
@@ -98,8 +97,8 @@ export default function DashboardPage() {
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-lg font-bold">5</div>
-            <p className="text-xs text-muted-foreground">+2 since last month</p>
+            <div className="text-lg font-bold">0</div>
+            <p className="text-xs text-muted-foreground">Let's get started.</p>
           </CardContent>
         </Card>
         <Card className="hover:bg-accent transition-colors">
@@ -110,7 +109,7 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
-                <div className="text-lg font-bold">3</div>
+                <div className="text-lg font-bold">0</div>
                 <ArrowRight className="h-4 w-4 text-muted-foreground" />
               </div>
               <p className="text-xs text-muted-foreground">View all badges</p>
@@ -123,8 +122,8 @@ export default function DashboardPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-lg font-bold">3</div>
-            <p className="text-xs text-muted-foreground">Education, Environment</p>
+            <div className="text-lg font-bold">0</div>
+            <p className="text-xs text-muted-foreground">Discover your cause.</p>
           </CardContent>
         </Card>
       </div>
@@ -159,29 +158,7 @@ export default function DashboardPage() {
             <h2 className="text-xl font-bold mb-4">Upcoming Commitments</h2>
             <Card>
               <CardContent className="p-6">
-                 {upcomingCommitments.length > 0 ? (
-                    <ul className="space-y-4">
-                      {upcomingCommitments.map((event: Event) => {
-                         const eventImage = PlaceHolderImages.find(p => p.id === event.imageUrl);
-                         return (
-                          <li key={event.id} className="flex items-center gap-4">
-                            {eventImage && (
-                              <Avatar className="h-12 w-12 rounded-md">
-                                <AvatarImage src={eventImage.imageUrl} alt={event.title} className="rounded-md" data-ai-hint={eventImage.imageHint} />
-                                <AvatarFallback className="rounded-md">{event.title.charAt(0)}</AvatarFallback>
-                              </Avatar>
-                            )}
-                            <div>
-                              <Link href={`/events/${event.id}`} className="font-semibold hover:underline text-sm">{event.title}</Link>
-                              <p className="text-xs text-muted-foreground">{event.date} at {event.time}</p>
-                            </div>
-                          </li>
-                         )
-                      })}
-                    </ul>
-                 ) : (
-                    <p className="text-muted-foreground text-sm">No upcoming commitments.</p>
-                 )}
+                 <p className="text-muted-foreground text-sm">No upcoming commitments.</p>
               </CardContent>
             </Card>
           </section>
