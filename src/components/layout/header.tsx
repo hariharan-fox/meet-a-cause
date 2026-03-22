@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Bell, Menu, UserCircle } from 'lucide-react';
+import { Bell, Menu } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -53,7 +53,7 @@ export default function Header() {
                                     {userAvatar ? (
                                         <AvatarImage src={userAvatar.imageUrl} alt={user.name} />
                                     ) : (
-                                        <AvatarFallback>{user?.name?.charAt(0) || 'V'}</AvatarFallback>
+                                        <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || 'V'}</AvatarFallback>
                                     )}
                                 </Avatar>
                                 <span className="sr-only">Toggle user menu</span>

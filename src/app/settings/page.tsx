@@ -58,7 +58,7 @@ export default function SettingsPage() {
                 {userAvatar ? (
                   <AvatarImage src={userAvatar.imageUrl} alt={user?.name || 'User'} />
                 ) : (
-                  <AvatarFallback>{user?.name?.charAt(0) || 'V'}</AvatarFallback>
+                  <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || 'V'}</AvatarFallback>
                 )}
               </Avatar>
               <Button variant="outline" onClick={() => showComingSoonToast('Changing your photo')}>Change Photo</Button>

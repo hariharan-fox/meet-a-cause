@@ -8,13 +8,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import { CheckCircle, Clock, Award, Users, ArrowRight } from 'lucide-react';
-import { featuredEvents, featuredNgos, allEvents } from '@/lib/placeholder-data';
+import { allEvents } from '@/lib/placeholder-data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import type { Event } from '@/lib/types';
 import EventCard from '@/components/shared/event-card';
 import NgoCard from '@/components/shared/ngo-card';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth-context';
+import { featuredEvents, featuredNgos } from '@/lib/placeholder-data';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -55,7 +55,7 @@ export default function DashboardPage() {
           {userAvatar ? (
              <AvatarImage src={userAvatar.imageUrl} alt={user?.name || 'User'} />
           ) : (
-             <AvatarFallback>{user?.name?.charAt(0) || 'V'}</AvatarFallback>
+             <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || 'V'}</AvatarFallback>
           )}
         </Avatar>
         <div>
