@@ -32,7 +32,7 @@
     }
   },
   "auth": {
-    "providers": ["phone"]
+    "providers": ["phone", "emailPassword"]
   },
   "firestore": {
     "/users/{userId}": {
