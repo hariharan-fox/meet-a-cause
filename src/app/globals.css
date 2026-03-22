@@ -4,32 +4,32 @@
 
 @layer base {
   :root {
-    --background: 40 20% 97%; /* Soft Warm Off-White */
-    --foreground: 240 5% 15%; /* Grey Black */
+    --background: 220 14% 96%; /* Silver */
+    --foreground: 240 10% 3.9%; /* Black */
 
-    --card: 40 20% 97%;
-    --card-foreground: 240 5% 15%;
+    --card: 220 14% 96%;
+    --card-foreground: 240 10% 3.9%;
 
-    --popover: 40 20% 97%;
-    --popover-foreground: 240 5% 15%;
+    --popover: 220 14% 96%;
+    --popover-foreground: 240 10% 3.9%;
 
     --primary: 148 62% 40%;      /* Vibrant Emerald */
     --primary-foreground: 148 15% 95%;
 
-    --secondary: 45 80% 95%;    /* Light Sunny Cream */
-    --secondary-foreground: 45 30% 25%; /* Dark Brown */
+    --secondary: 220 14% 91%;    /* Lighter Silver */
+    --secondary-foreground: 240 10% 3.9%; /* Black */
 
-    --muted: 45 80% 95%;
-    --muted-foreground: 45 25% 55%;
+    --muted: 220 14% 91%;
+    --muted-foreground: 240 3.8% 46.1%; /* Muted Grey */
 
-    --accent: 40 85% 65%;       /* Vibrant Marigold */
-    --accent-foreground: 40 50% 15%; /* Dark Brown */
+    --accent: 148 50% 94%;       /* Light Emerald */
+    --accent-foreground: 148 62% 30%; /* Dark Green */
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 40 30% 88%;
-    --input: 40 30% 88%;
+    --border: 220 13% 90%;
+    --input: 220 13% 90%;
     --ring: 148 62% 40%;
 
     --radius: 0.75rem;
