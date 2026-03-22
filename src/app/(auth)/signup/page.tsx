@@ -48,7 +48,11 @@ export default function SignupPage() {
       await signup(values.name, values.email, values.password);
       router.push('/');
     } catch (err: any) {
-      let message = 'An unknown error occurred.';
+      console.error("Signup Failed:", err); // Log the full error for debugging
+
+      let message = 'Failed to create an account. Please try again.';
+      
+      // Handle Firebase Auth specific errors
       if (err.code) {
         switch (err.code) {
           case 'auth/email-already-in-use':
@@ -60,11 +64,19 @@ export default function SignupPage() {
           case 'auth/invalid-email':
             message = 'Please enter a valid email address.';
             break;
+          case 'permission-denied': // Handle Firestore permission errors
+            message = 'There was a problem setting up your profile. Please contact support.';
+            break;
           default:
-            message = 'Failed to create an account. Please try again.';
+            // Use the error message from Firebase if available
+            message = err.message || 'An unknown error occurred during signup.';
             break;
         }
+      } else if (err.message) {
+         // For other types of errors that have a message property
+         message = err.message;
       }
+
       form.setError("root.serverError", {
         type: "manual",
         message,

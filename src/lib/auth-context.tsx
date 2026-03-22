@@ -76,37 +76,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoadingProfile(true);
     const profileRef = doc(firestore, 'users', firebaseUser.uid);
 
-    // Set up the real-time listener
     const unsubscribe = onSnapshot(profileRef, (docSnap) => {
       if (docSnap.exists()) {
         setProfile(docSnap.data() as UserProfile);
       } else {
-        // This is the "self-healing" part. If a user is authenticated but has no profile,
-        // we create one for them on the fly. This prevents the app from breaking.
-        console.warn("User profile not found, creating a new one for:", firebaseUser.uid);
-        const newProfile: UserProfile = {
-          id: firebaseUser.uid,
-          name: firebaseUser.displayName || 'New Volunteer',
-          email: firebaseUser.email || '',
-          role: 'volunteer',
-          avatarUrl: '',
-          skills: [],
-          interests: [],
-          completedEventIds: [],
-          registeredEventIds: [],
-          earnedBadgeIds: [],
-          loggedHours: 0,
-          notifications: [{
-              id: `notif-welcome-${Date.now()}`,
-              title: 'Welcome to Meet A Cause!',
-              description: 'Thank you for joining our community. Explore events and start making an impact!',
-              createdAt: 'Just now',
-              isRead: false,
-          }],
-        };
-        setDoc(profileRef, newProfile)
-            .then(() => console.log("Successfully created missing user profile."))
-            .catch(err => console.error("Error creating missing user profile:", err));
+        // If the user is authenticated but has no profile, it's an inconsistent state.
+        // We log them out to force a clean login/signup attempt.
+        setProfile(null);
+        console.warn(`Profile for user ${firebaseUser.uid} not found. Forcing logout.`);
+        signOut(firebaseAuth);
       }
       setIsLoadingProfile(false);
     }, (error) => {
@@ -115,7 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => unsubscribe();
-  }, [firebaseUser, firestore]);
+  }, [firebaseUser, firestore, firebaseAuth]);
   
   const checkAndUnlockBadges = useCallback(async (user: AppUser): Promise<{ earnedBadgeIds: string[], notifications: Notification[] } | null> => {
     const newlyEarnedBadges: Certificate[] = [];
@@ -174,13 +152,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signup = async (name: string, email: string, password: string) => {
+    // Step 1: Create the user in Firebase Authentication
     const userCredential = await createUserWithEmailAndPassword(firebaseAuth, email, password);
-    const { user } = userCredential;
-    
-    await updateProfile(user, { displayName: name });
+    const authUser = userCredential.user;
 
-    // The onSnapshot listener will now handle creating the profile document,
-    // ensuring it's only done once and preventing race conditions.
+    // Step 2: Update the user's display name in their Auth profile
+    await updateProfile(authUser, { displayName: name });
+
+    // Step 3: Create the corresponding user profile document in Firestore
+    const profileRef = doc(firestore, 'users', authUser.uid);
+    const newProfile: UserProfile = {
+      id: authUser.uid,
+      name: name,
+      email: email,
+      role: 'volunteer',
+      avatarUrl: '',
+      skills: [],
+      interests: [],
+      completedEventIds: [],
+      registeredEventIds: [],
+      earnedBadgeIds: [],
+      loggedHours: 0,
+      notifications: [{
+          id: `notif-welcome-${Date.now()}`,
+          title: 'Welcome to Meet A Cause!',
+          description: 'Thank you for joining our community. Explore events and start making an impact!',
+          createdAt: 'Just now',
+          isRead: false,
+      }],
+    };
+    
+    await setDoc(profileRef, newProfile);
   };
 
   const logout = () => {
