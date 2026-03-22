@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/lib/auth-context';
 import { BadgeUnlockProvider } from '@/lib/badge-unlock-context';
 import { ClientLayout } from '@/components/layout/client-layout';
+import { FirebaseClientProvider } from '@/firebase';
 import { Merriweather, Inter } from 'next/font/google';
 
 const headlineFont = Merriweather({
@@ -35,9 +36,11 @@ export default function RootLayout({
       <body className={cn('min-h-screen bg-background font-body text-foreground/90 antialiased')}>
         <BadgeUnlockProvider>
           <AuthProvider>
-            <ClientLayout>
-              {children}
-            </ClientLayout>
+            <FirebaseClientProvider>
+              <ClientLayout>
+                {children}
+              </ClientLayout>
+            </FirebaseClientProvider>
           </AuthProvider>
         </BadgeUnlockProvider>
         <Toaster />
