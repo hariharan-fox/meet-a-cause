@@ -13,7 +13,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const { user, isLoading } = useAuth();
 
-    const isAuthPage = pathname?.startsWith('/login') || pathname?.startsWith('/signup') || pathname?.startsWith('/waitlist');
+    const isAuthPage = pathname?.startsWith('/login') || pathname?.startsWith('/signup');
     const isPublicPage = pathname === '/' || isAuthPage || pathname?.startsWith('/events') || pathname?.startsWith('/ngos');
 
     useEffect(() => {
