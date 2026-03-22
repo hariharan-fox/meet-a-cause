@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import type { Notification } from './types';
 
 type User = {
   id: string;
@@ -13,6 +14,7 @@ type User = {
   registeredEventIds: string[];
   earnedBadgeIds: string[];
   loggedHours: number;
+  notifications: Notification[];
 };
 
 interface AuthContextType {
@@ -54,6 +56,36 @@ const initializeMockDB = () => {
       registeredEventIds: ['evt-5', 'evt-6'],
       earnedBadgeIds: ['start-1', 'start-2', 'start-3', 'event-1', 'hours-1'],
       loggedHours: 13,
+      notifications: [
+        {
+          id: 'notif-1',
+          title: 'New Badge Unlocked!',
+          description: 'You earned the "Active Volunteer" badge. Keep up the great work!',
+          createdAt: '2 hours ago',
+          isRead: false,
+        },
+        {
+          id: 'notif-2',
+          title: 'Event Reminder',
+          description: 'Your commitment for "Weekend Food Donation Sorting" is tomorrow.',
+          createdAt: '1 day ago',
+          isRead: false,
+        },
+        {
+          id: 'notif-3',
+          title: 'New Event Opportunity',
+          description: 'Green Earth Foundation just posted a new event: "Urban Gardening Workshop".',
+          createdAt: '3 days ago',
+          isRead: true,
+        },
+          {
+          id: 'notif-4',
+          title: 'Welcome to Meet A Cause!',
+          description: 'Thank you for joining our community of volunteers.',
+          createdAt: '1 week ago',
+          isRead: true,
+        },
+      ],
     });
     setMockUsers(users);
   }
@@ -118,6 +150,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           registeredEventIds: [],
           earnedBadgeIds: [],
           loggedHours: 0,
+          notifications: [
+            {
+              id: `notif-welcome-${Date.now()}`,
+              title: 'Welcome to Meet A Cause!',
+              description: 'Thank you for joining our community. Explore events and start making an impact!',
+              createdAt: 'Just now',
+              isRead: false,
+            }
+          ],
         };
         
         mockUsers.push(newUser);

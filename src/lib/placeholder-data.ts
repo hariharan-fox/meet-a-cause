@@ -229,37 +229,6 @@ export const allCertificates: Certificate[] = [
   { id: 'placeholder-5', name: 'Senior Support', description: 'Complete 5 events focused on senior citizens.', rule: 'Complete 5 events for "Seniors"', icon: Award, isEarned: false, level: 'Silver', shape: 'circle', category: 'Skill & Dedication' },
 ];
 
-export const notifications: Notification[] = [
-  {
-    id: 'notif-1',
-    title: 'New Badge Unlocked!',
-    description: 'You earned the "Active Volunteer" badge. Keep up the great work!',
-    createdAt: '2 hours ago',
-    isRead: false,
-  },
-  {
-    id: 'notif-2',
-    title: 'Event Reminder',
-    description: 'Your commitment for "Weekend Food Donation Sorting" is tomorrow.',
-    createdAt: '1 day ago',
-    isRead: false,
-  },
-  {
-    id: 'notif-3',
-    title: 'New Event Opportunity',
-    description: 'Green Earth Foundation just posted a new event: "Urban Gardening Workshop".',
-    createdAt: '3 days ago',
-    isRead: true,
-  },
-    {
-    id: 'notif-4',
-    title: 'Welcome to Meet A Cause!',
-    description: 'Thank you for joining our community of volunteers.',
-    createdAt: '1 week ago',
-    isRead: true,
-  },
-];
-
 export const howItWorks = [
   {
     title: 'Discover Opportunities',

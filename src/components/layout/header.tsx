@@ -15,7 +15,6 @@ import {
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/lib/auth-context';
-import { notifications } from '@/lib/placeholder-data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Logo } from '../shared/logo';
 
@@ -24,7 +23,7 @@ export default function Header() {
     const userAvatar = user?.avatarUrl ? PlaceHolderImages.find(p => p.id === user.avatarUrl) : undefined;
 
     if (user) {
-        const unreadNotifications = notifications.filter(n => !n.isRead).length;
+        const unreadNotifications = user.notifications?.filter(n => !n.isRead).length || 0;
         
         return (
             <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b bg-background/80 backdrop-blur-lg px-4 sm:px-6">

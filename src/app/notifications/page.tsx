@@ -1,12 +1,31 @@
 'use client';
 
-import { notifications } from '@/lib/placeholder-data';
+import { useAuth } from '@/lib/auth-context';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
 export default function NotificationsPage() {
+  const { user, updateUser } = useAuth();
+
+  const notifications = user?.notifications?.sort((a, b) => {
+      // A simple sort to put unread first.
+      if (a.isRead !== b.isRead) {
+        return a.isRead ? 1 : -1;
+      }
+      // This is not a reliable date sort since createdAt is a string.
+      // For a real app, use Date objects.
+      return 0;
+  }) || [];
+
   const unreadNotifications = notifications.filter(n => !n.isRead).length;
+
+  const handleMarkAllAsRead = () => {
+    if (user) {
+      const readNotifications = user.notifications.map(n => ({ ...n, isRead: true }));
+      updateUser({ notifications: readNotifications });
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 md:px-6 py-8 animate-slide-in-from-bottom">
@@ -22,7 +41,9 @@ export default function NotificationsPage() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base">All Notifications</CardTitle>
-            {notifications.length > 0 && <Button variant="outline" size="sm">Mark all as read</Button>}
+            {notifications.length > 0 && unreadNotifications > 0 && (
+              <Button variant="outline" size="sm" onClick={handleMarkAllAsRead}>Mark all as read</Button>
+            )}
         </CardHeader>
         <CardContent className="p-0">
             <div className="grid">
