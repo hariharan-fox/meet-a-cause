@@ -1,5 +1,5 @@
 import type { Volunteer, Event, NGO, Testimonial, Certificate, Notification } from './types';
-import { BookOpen, Sprout, HeartPulse, Users, ShieldCheck, Rocket, Star, Heart, Medal, Trophy, Gem, Crown, Zap, TrendingUp, Award, UserPlus } from 'lucide-react';
+import { BookOpen, Sprout, HeartPulse, Users, ShieldCheck, Rocket, Star, Heart, Medal, Trophy, Gem, Crown, Zap, TrendingUp, Award, UserPlus, Phone } from 'lucide-react';
 
 export const volunteer: Volunteer = {
   id: 'vol-1',
@@ -163,6 +163,7 @@ export const allCertificates: Certificate[] = [
   { id: 'start-1', name: 'Verified Volunteer', description: 'Complete your first event and get verified.', rule: 'Complete 1 event', icon: ShieldCheck, isEarned: false, level: 'Bronze', shape: 'hexagon', category: 'Getting Started' },
   { id: 'start-2', name: 'Fast Starter', description: 'Complete an event within your first 7 days.', rule: 'Complete 1 event within 7 days of signup', icon: Rocket, isEarned: false, level: 'Silver', shape: 'pentagon', category: 'Getting Started' },
   { id: 'start-3', name: 'Profile Pro', description: 'Complete your user profile with skills and interests.', rule: 'Fill out profile skills and interests', icon: Users, isEarned: false, level: 'Bronze', shape: 'circle', category: 'Getting Started' },
+  { id: 'start-4', name: 'Communicator', description: 'Add your phone number to your profile.', rule: 'Add a phone number', icon: Phone, isEarned: false, level: 'Bronze', shape: 'circle', category: 'Getting Started' },
 
   // Event Participation
   { id: 'event-1', name: 'First Step', description: 'Complete your first event.', rule: 'Complete 1 event', icon: Medal, isEarned: false, level: 'Bronze', shape: 'hexagon', category: 'Event Participation' },

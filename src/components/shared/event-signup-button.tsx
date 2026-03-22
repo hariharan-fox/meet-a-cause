@@ -5,8 +5,6 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { UserPlus, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useBadgeUnlock } from '@/lib/badge-unlock-context';
-import { allCertificates } from '@/lib/placeholder-data';
 
 export default function EventSignUpButton({ eventId, eventTitle }: { eventId: string; eventTitle: string; }) {
   const { user, updateUser } = useAuth();
@@ -22,7 +20,6 @@ export default function EventSignUpButton({ eventId, eventTitle }: { eventId: st
       return;
     }
     
-    // Prevent re-registration
     if (isRegistered || isCompleted) {
       toast({
         title: "Already Registered",
@@ -31,18 +28,19 @@ export default function EventSignUpButton({ eventId, eventTitle }: { eventId: st
       return;
     }
 
-    // In a real app, this would be a server action.
     toast({
       title: "Successfully Registered!",
       description: `You have signed up for "${eventTitle}". It's now in your dashboard.`,
     });
     
-    // Update user state: add event to registered list
-    const updatedUser = {
+    // MOCK: Simulate completing the event and logging hours to make badge system functional
+    const hoursGained = 4; // Assume each event is 4 hours
+
+    updateUser({
       registeredEventIds: [...(user.registeredEventIds || []), eventId],
-    };
-    
-    updateUser(updatedUser);
+      completedEventIds: [...(user.completedEventIds || []), eventId],
+      loggedHours: (user.loggedHours || 0) + hoursGained,
+    });
   };
   
   if (isCompleted) {

@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/lib/auth-context";
-import { LogOut, ArrowRight, Gift, Copy } from "lucide-react";
+import { LogOut, ArrowRight, Gift, Copy, Phone } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { allEvents } from "@/lib/placeholder-data";
@@ -28,8 +28,15 @@ import { Textarea } from "@/components/ui/textarea";
 
 
 export default function SettingsPage() {
-  const { user, logout, changePassword, deleteAccount } = useAuth();
+  const { user, logout, changePassword, deleteAccount, updateUser } = useAuth();
   const { toast } = useToast();
+  
+  // State for editable profile fields
+  const [name, setName] = useState(user?.name || '');
+  const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber || '');
+  const [skills, setSkills] = useState(user?.skills?.join(', ') || '');
+  const [interests, setInterests] = useState(user?.interests?.join(', ') || '');
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   
   const referralLink = `https://meet-a-cause.app/signup?ref=${user?.id || 'volunteer123'}`;
 
@@ -65,6 +72,35 @@ export default function SettingsPage() {
       title: 'Feature Coming Soon!',
       description: `${feature} is not yet available but will be in a future update.`,
     });
+  };
+
+  const handleProfileUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsUpdatingProfile(true);
+    
+    const skillsArray = skills.split(',').map(s => s.trim()).filter(Boolean);
+    const interestsArray = interests.split(',').map(i => i.trim()).filter(Boolean);
+
+    try {
+      updateUser({
+        name,
+        phoneNumber,
+        skills: skillsArray,
+        interests: interestsArray,
+      });
+      toast({
+        title: "Profile Updated",
+        description: "Your profile has been successfully updated.",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Update Failed",
+        description: error.message,
+      });
+    } finally {
+      setIsUpdatingProfile(false);
+    }
   };
 
   const handleChangePassword = async (e: React.FormEvent) => {
@@ -103,7 +139,6 @@ export default function SettingsPage() {
         title: "Account Deleted",
         description: "Your account has been permanently deleted.",
       });
-      // The auth context will handle the redirect.
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -120,34 +155,54 @@ export default function SettingsPage() {
         <h1 className="text-lg font-bold">My Profile & Settings</h1>
         
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Public Profile</CardTitle>
-            <CardDescription>
-              This is how others will see you on the site.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex items-center gap-4">
-              <Avatar className="h-20 w-20">
-                {userAvatar ? (
-                  <AvatarImage src={userAvatar.imageUrl} alt={user?.name || 'User'} />
-                ) : (
-                  <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || 'V'}</AvatarFallback>
-                )}
-              </Avatar>
-              <Button variant="outline" onClick={() => showComingSoonToast('Changing your photo')}>Change Photo</Button>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
-              <Input id="name" defaultValue={user?.name || ''} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" defaultValue={user?.email || ''} disabled />
-              <p className="text-xs text-muted-foreground">Your email address is not displayed publicly.</p>
-            </div>
-            <Button onClick={() => showComingSoonToast('Updating your profile')}>Update Profile</Button>
-          </CardContent>
+          <form onSubmit={handleProfileUpdate}>
+            <CardHeader>
+              <CardTitle className="text-base">Public Profile</CardTitle>
+              <CardDescription>
+                This is how others will see you on the site. Your skills and interests help us recommend events.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex items-center gap-4">
+                <Avatar className="h-20 w-20">
+                  {userAvatar ? (
+                    <AvatarImage src={userAvatar.imageUrl} alt={user?.name || 'User'} />
+                  ) : (
+                    <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || 'V'}</AvatarFallback>
+                  )}
+                </Avatar>
+                <Button variant="outline" type="button" onClick={() => showComingSoonToast('Changing your photo')}>Change Photo</Button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input id="name" value={name} onChange={(e) => setName(e.target.value)} />
+                </div>
+                 <div className="space-y-2">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input id="phone" type="tel" placeholder="e.g. 9876543210" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" value={user?.email || ''} disabled />
+                <p className="text-xs text-muted-foreground">Your email address is not displayed publicly.</p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="skills">Your Skills</Label>
+                <Textarea id="skills" placeholder="e.g. Web Development, Graphic Design, Public Speaking" value={skills} onChange={(e) => setSkills(e.target.value)} />
+                <p className="text-xs text-muted-foreground">Separate skills with a comma. This helps us recommend relevant volunteer opportunities.</p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="interests">Your Interests</Label>
+                 <Textarea id="interests" placeholder="e.g. Environment, Education, Animal Welfare" value={interests} onChange={(e) => setInterests(e.target.value)} />
+                <p className="text-xs text-muted-foreground">Separate interests with a comma.</p>
+              </div>
+              <Button type="submit" disabled={isUpdatingProfile}>
+                {isUpdatingProfile ? 'Updating...' : 'Update Profile'}
+              </Button>
+            </CardContent>
+          </form>
         </Card>
 
         <Card>

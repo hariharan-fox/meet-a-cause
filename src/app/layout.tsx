@@ -33,13 +33,13 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn(headlineFont.variable, bodyFont.variable)}>
       <body className={cn('min-h-screen bg-background font-body text-foreground/90 antialiased')}>
-        <AuthProvider>
-          <BadgeUnlockProvider>
+        <BadgeUnlockProvider>
+          <AuthProvider>
             <ClientLayout>
               {children}
             </ClientLayout>
-          </BadgeUnlockProvider>
-        </AuthProvider>
+          </AuthProvider>
+        </BadgeUnlockProvider>
         <Toaster />
       </body>
     </html>
