@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,7 +15,7 @@ import { allEvents } from "@/lib/placeholder-data";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 export default function SettingsPage() {
-  const { user, logout } = useAuth();
+  const { user, logout, changePassword } = useAuth();
   const { toast } = useToast();
   
   const referralLink = `https://meet-a-cause.app/signup?ref=${user?.id || 'volunteer123'}`;
@@ -24,6 +25,15 @@ export default function SettingsPage() {
   );
 
   const userAvatar = user?.avatarUrl ? PlaceHolderImages.find(p => p.id === user.avatarUrl) : undefined;
+
+  // State for password change form
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+
 
   const handleCopy = () => {
     navigator.clipboard.writeText(referralLink);
@@ -38,6 +48,34 @@ export default function SettingsPage() {
       title: 'Feature Coming Soon!',
       description: `${feature} is not yet available but will be in a future update.`,
     });
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError(null);
+    setPasswordSuccess(null);
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError("The new passwords do not match.");
+      return;
+    }
+    if (newPassword.length < 6) {
+      setPasswordError("Password must be at least 6 characters long.");
+      return;
+    }
+
+    setIsChangingPassword(true);
+    try {
+      await changePassword(currentPassword, newPassword);
+      setPasswordSuccess("Your password has been changed successfully!");
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err: any) {
+      setPasswordError(err.message);
+    } finally {
+      setIsChangingPassword(false);
+    }
   };
 
   return (
@@ -145,10 +183,44 @@ export default function SettingsPage() {
               </Button>
             </div>
             <Separator />
-            <div className="space-y-2">
-                <Button variant="outline" className="mt-4" onClick={() => showComingSoonToast('Changing your password')}>Change Password</Button>
-                <p className="text-xs text-muted-foreground">You will be sent an email to reset your password.</p>
-            </div>
+             <form onSubmit={handleChangePassword} className="space-y-4">
+                <h3 className="text-base font-medium">Change Password</h3>
+                {passwordError && <p className="text-sm text-destructive">{passwordError}</p>}
+                {passwordSuccess && <p className="text-sm text-green-600">{passwordSuccess}</p>}
+                <div className="space-y-2">
+                  <Label htmlFor="current-password">Current Password</Label>
+                  <Input 
+                    id="current-password" 
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    required 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="new-password">New Password</Label>
+                  <Input 
+                    id="new-password" 
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirm-password">Confirm New Password</Label>
+                  <Input 
+                    id="confirm-password" 
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                  />
+                </div>
+                <Button type="submit" variant="outline" disabled={isChangingPassword}>
+                  {isChangingPassword ? 'Changing...' : 'Update Password'}
+                </Button>
+             </form>
             <Separator />
               <div className="space-y-4">
               <h3 className="text-base font-medium">Danger Zone</h3>

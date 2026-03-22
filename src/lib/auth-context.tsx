@@ -22,6 +22,7 @@ interface AuthContextType {
   logout: () => void;
   isLoading: boolean;
   updateUser: (updatedData: Partial<Omit<User, 'password'>>) => void;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -40,7 +41,7 @@ const setMockUsers = (users: (User & { password: string })[]) => {
 const initializeMockDB = () => {
   const users = getMockUsers();
   const priyaExists = users.some(u => u.email === 'priya.sharma@example.com');
-  if (!priyaExists) {
+  if (!priaExists) {
     users.push({
       id: '1',
       name: 'Priya Sharma',
@@ -156,9 +157,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const changePassword = async (currentPassword: string, newPassword: string) => {
+    return new Promise<void>((resolve, reject) => {
+      setTimeout(() => {
+        if (!user) {
+          return reject(new Error('You must be logged in.'));
+        }
+
+        const mockUsers = getMockUsers();
+        const userIndex = mockUsers.findIndex(u => u.id === user.id);
+
+        if (userIndex === -1) {
+          return reject(new Error('Current user not found in database.'));
+        }
+
+        if (mockUsers[userIndex].password !== currentPassword) {
+          return reject(new Error('The current password you entered is incorrect.'));
+        }
+
+        // Update password in our mock DB
+        mockUsers[userIndex].password = newPassword;
+        setMockUsers(mockUsers);
+
+        resolve();
+      }, 500);
+    });
+  };
+
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout, isLoading, updateUser }}>
+    <AuthContext.Provider value={{ user, login, signup, logout, isLoading, updateUser, changePassword }}>
       {children}
     </AuthContext.Provider>
   );
