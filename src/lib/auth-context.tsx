@@ -77,14 +77,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const profileRef = doc(firestore, 'users', firebaseUser.uid);
 
     // Set up the real-time listener
-    const unsubscribe = onSnapshot(profileRef, (doc) => {
-      if (doc.exists()) {
-        setProfile(doc.data() as UserProfile);
+    const unsubscribe = onSnapshot(profileRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setProfile(docSnap.data() as UserProfile);
       } else {
-        // If the user is authenticated but has no profile, it's an issue.
-        // For now, we log it. The signup function should prevent this.
-        console.error("User profile does not exist in Firestore for UID:", firebaseUser.uid);
-        setProfile(null); // Explicitly set to null to handle this state in the UI if needed
+        // This is the "self-healing" part. If a user is authenticated but has no profile,
+        // we create one for them on the fly. This prevents the app from breaking.
+        console.warn("User profile not found, creating a new one for:", firebaseUser.uid);
+        const newProfile: UserProfile = {
+          id: firebaseUser.uid,
+          name: firebaseUser.displayName || 'New Volunteer',
+          email: firebaseUser.email || '',
+          role: 'volunteer',
+          avatarUrl: '',
+          skills: [],
+          interests: [],
+          completedEventIds: [],
+          registeredEventIds: [],
+          earnedBadgeIds: [],
+          loggedHours: 0,
+          notifications: [{
+              id: `notif-welcome-${Date.now()}`,
+              title: 'Welcome to Meet A Cause!',
+              description: 'Thank you for joining our community. Explore events and start making an impact!',
+              createdAt: 'Just now',
+              isRead: false,
+          }],
+        };
+        setDoc(profileRef, newProfile)
+            .then(() => console.log("Successfully created missing user profile."))
+            .catch(err => console.error("Error creating missing user profile:", err));
       }
       setIsLoadingProfile(false);
     }, (error) => {
@@ -152,14 +174,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signup = async (name: string, email: string, password: string) => {
-    // 1. Create the user in Firebase Auth
     const userCredential = await createUserWithEmailAndPassword(firebaseAuth, email, password);
     const { user } = userCredential;
     
-    // 2. Update their Auth profile with their name
     await updateProfile(user, { displayName: name });
 
-    // 3. Create their corresponding user profile document in Firestore
     const profileRef = doc(firestore, 'users', user.uid);
     const newProfile: UserProfile = {
       id: user.uid,
@@ -182,9 +201,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }],
     };
     
+    // Explicitly create the document right after creating the user.
+    // This is the key fix.
     await setDoc(profileRef, newProfile);
-    // The real-time listener in the `useEffect` will now automatically
-    // pick up this new profile and set the application state.
   };
 
   const logout = () => {
@@ -198,7 +217,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const profileRef = doc(firestore, 'users', firebaseUser.uid);
     const newProfileState = { ...profile, ...updatedData };
     
-    // Check for badges BEFORE updating firestore
     const badgeUpdates = await checkAndUnlockBadges({ ...newProfileState, auth: firebaseUser });
 
     const finalProfileData = badgeUpdates ? { ...updatedData, ...badgeUpdates } : updatedData;
@@ -216,8 +234,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const deleteAccount = async (reason: string) => {
     if (!firebaseUser) throw new Error("User not logged in");
-    // In a real app, you would send the reason to your backend.
     console.log(`Account deletion for ${firebaseUser.uid}, reason:`, reason);
+    
+    // In a real app, you might want to delete the user's Firestore document first.
+    const profileRef = doc(firestore, 'users', firebaseUser.uid);
+    // await deleteDoc(profileRef); // This would delete their data.
+    
     await deleteUser(firebaseUser);
   };
 
