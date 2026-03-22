@@ -80,41 +80,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsubscribe = onSnapshot(profileRef, (doc) => {
       if (doc.exists()) {
         setProfile(doc.data() as UserProfile);
+      } else {
+        // If the user is authenticated but has no profile, it's an issue.
+        // For now, we log it. The signup function should prevent this.
+        console.error("User profile does not exist in Firestore for UID:", firebaseUser.uid);
+        setProfile(null); // Explicitly set to null to handle this state in the UI if needed
       }
       setIsLoadingProfile(false);
     }, (error) => {
       console.error("Firestore snapshot error:", error);
       setIsLoadingProfile(false);
-    });
-
-    // Check if the document exists and create it if not.
-    // This is a one-time "self-healing" check when auth state changes.
-    getDoc(profileRef).then(docSnap => {
-      if (!docSnap.exists()) {
-        const newProfile: UserProfile = {
-          id: firebaseUser.uid,
-          name: firebaseUser.displayName || 'New Volunteer',
-          email: firebaseUser.email || '',
-          role: 'volunteer',
-          avatarUrl: '',
-          skills: [],
-          interests: [],
-          completedEventIds: [],
-          registeredEventIds: [],
-          earnedBadgeIds: [],
-          loggedHours: 0,
-          notifications: [{
-              id: `notif-welcome-${Date.now()}`,
-              title: 'Welcome to Meet A Cause!',
-              description: 'Thank you for joining our community. Explore events and start making an impact!',
-              createdAt: 'Just now',
-              isRead: false,
-          }],
-        };
-        setDoc(profileRef, newProfile).catch(err => {
-            console.error("Failed to auto-create profile:", err);
-        });
-      }
     });
 
     return () => unsubscribe();
@@ -177,12 +152,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signup = async (name: string, email: string, password: string) => {
+    // 1. Create the user in Firebase Auth
     const userCredential = await createUserWithEmailAndPassword(firebaseAuth, email, password);
     const { user } = userCredential;
     
-    // Update the user's profile in Firebase Auth.
-    // The useEffect hook above will handle creating the Firestore document.
-    await updateProfile(user, { displayName: name, photoURL: '' });
+    // 2. Update their Auth profile with their name
+    await updateProfile(user, { displayName: name });
+
+    // 3. Create their corresponding user profile document in Firestore
+    const profileRef = doc(firestore, 'users', user.uid);
+    const newProfile: UserProfile = {
+      id: user.uid,
+      name: name,
+      email: email,
+      role: 'volunteer',
+      avatarUrl: '',
+      skills: [],
+      interests: [],
+      completedEventIds: [],
+      registeredEventIds: [],
+      earnedBadgeIds: [],
+      loggedHours: 0,
+      notifications: [{
+          id: `notif-welcome-${Date.now()}`,
+          title: 'Welcome to Meet A Cause!',
+          description: 'Thank you for joining our community. Explore events and start making an impact!',
+          createdAt: 'Just now',
+          isRead: false,
+      }],
+    };
+    
+    await setDoc(profileRef, newProfile);
+    // The real-time listener in the `useEffect` will now automatically
+    // pick up this new profile and set the application state.
   };
 
   const logout = () => {
