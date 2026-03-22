@@ -5,25 +5,25 @@
 @layer base {
   :root {
     --background: 40 20% 97%; /* Soft Warm Off-White */
-    --foreground: 30 40% 15%; /* Rich Dark Bronze */
+    --foreground: 240 5% 15%; /* Grey Black */
 
     --card: 40 20% 97%;
-    --card-foreground: 30 40% 15%;
+    --card-foreground: 240 5% 15%;
 
     --popover: 40 20% 97%;
-    --popover-foreground: 30 40% 15%;
+    --popover-foreground: 240 5% 15%;
 
     --primary: 145 65% 35%; /* Emerald Green */
     --primary-foreground: 145 10% 98%;
 
     --secondary: 30 30% 95%; /* Light Bronze */
-    --secondary-foreground: 30 30% 20%;
+    --secondary-foreground: 240 4% 30%;
 
     --muted: 30 30% 95%;
-    --muted-foreground: 30 20% 40%;
+    --muted-foreground: 240 4% 50%;
 
     --accent: 30 30% 90%;
-    --accent-foreground: 30 40% 15%;
+    --accent-foreground: 240 5% 15%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
