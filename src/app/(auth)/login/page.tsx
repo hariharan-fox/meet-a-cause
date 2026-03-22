@@ -43,13 +43,13 @@ export default function LoginPage() {
       <Card className="mx-auto max-w-sm w-full">
         <CardHeader className="text-center">
           <Logo className="justify-center mb-2" />
-          <CardTitle className="text-lg">Login</CardTitle>
-          <CardDescription>Enter your email below to login to your account</CardDescription>
+          <CardTitle className="text-lg">Volunteer Login</CardTitle>
+          <CardDescription>Enter your details to access your dashboard.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="grid gap-4">
             {error && (
-              <div className="text-sm text-red-500 text-center font-medium bg-red-100 p-2 rounded-md">
+              <div className="text-sm text-destructive text-center font-medium bg-destructive/10 p-2 rounded-md">
                 {error}
               </div>
             )}
@@ -58,7 +58,7 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="priya@example.com"
+                placeholder="priya.sharma@example.com"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}

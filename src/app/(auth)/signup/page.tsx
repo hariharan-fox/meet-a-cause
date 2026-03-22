@@ -2,28 +2,21 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useSearchParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Logo } from '@/components/shared/logo';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/hooks/use-toast';
-import { Info } from 'lucide-react';
 
 export default function SignupPage() {
   const { signup } = useAuth();
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const referrerId = searchParams.get('ref');
   const { toast } = useToast();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<'volunteer' | 'ngo'>('volunteer');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -32,10 +25,7 @@ export default function SignupPage() {
     setIsLoading(true);
     setError(null);
     try {
-      // Signup logic only applies to NGOs now
-      if (role === 'ngo') {
-        await signup(name, email, password, role, referrerId);
-      }
+      await signup(name, email, password);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -55,90 +45,54 @@ export default function SignupPage() {
       <Card className="mx-auto max-w-sm w-full">
         <CardHeader className="text-center">
           <Logo className="justify-center mb-2" />
-          <CardTitle className="text-lg">Create an Account</CardTitle>
-          <CardDescription>Are you a Volunteer or an NGO?</CardDescription>
+          <CardTitle className="text-lg">Create a Volunteer Account</CardTitle>
+          <CardDescription>Enter your details to join the community.</CardDescription>
         </CardHeader>
         <CardContent>
-            <div className="grid gap-4">
-                <RadioGroup
-                    value={role}
-                    onValueChange={(val) => setRole(val as 'volunteer' | 'ngo')}
-                    className="flex gap-4 justify-center"
-                >
-                    <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="volunteer" id="volunteer" />
-                    <Label htmlFor="volunteer">I'm a Volunteer</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="ngo" id="ngo" />
-                    <Label htmlFor="ngo">We're an NGO</Label>
-                    </div>
-                </RadioGroup>
+          <form onSubmit={handleSubmit} className="grid gap-4">
+            {error && (
+              <div className="text-sm text-destructive text-center font-medium bg-destructive/10 p-2 rounded-md">
+                {error}
+              </div>
+            )}
+            <div className="grid gap-2">
+              <Label htmlFor="full-name">Full Name</Label>
+              <Input
+                id="full-name"
+                placeholder="Priya Sharma"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
             </div>
-
-            <div className="mt-6">
-                {role === 'volunteer' && (
-                    <div className="text-center space-y-4 p-4 bg-accent/50 rounded-lg">
-                        <Info className="mx-auto h-8 w-8 text-primary" />
-                        <h3 className="font-semibold">We're Getting Ready!</h3>
-                        <p className="text-sm text-muted-foreground">
-                            We are currently onboarding amazing NGOs and events. Join our waitlist to be the first to know when you can start volunteering.
-                        </p>
-                        <Button className="w-full" onClick={() => router.push('/waitlist')}>
-                            Join the Volunteer Waitlist
-                        </Button>
-                    </div>
-                )}
-
-                {role === 'ngo' && (
-                    <form onSubmit={handleSubmit} className="grid gap-4 animate-in fade-in-0">
-                        {error && (
-                        <div className="text-sm text-red-500 text-center font-medium bg-red-100 p-2 rounded-md">
-                            {error}
-                        </div>
-                        )}
-                         <p className="text-sm text-center text-muted-foreground">Please fill in the details to register your organization.</p>
-                        <div className="grid gap-2">
-                        <Label htmlFor="full-name">Organization Name</Label>
-                        <Input
-                            id="full-name"
-                            placeholder="Green Earth Foundation"
-                            required
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                        />
-                        </div>
-                        <div className="grid gap-2">
-                        <Label htmlFor="email">Work Email</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            placeholder="contact@greenearth.org"
-                            required
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        />
-                        </div>
-                        <div className="grid gap-2">
-                        <Label htmlFor="password">Password</Label>
-                        <Input
-                            id="password"
-                            type="password"
-                            required
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                        </div>
-                        <Button type="submit" className="w-full" disabled={isLoading}>
-                            {isLoading ? 'Creating account...' : 'Register as NGO'}
-                        </Button>
-                        <Button variant="outline" className="w-full" type="button" onClick={handleGoogleSignup}>
-                            Sign up with Google
-                        </Button>
-                    </form>
-                )}
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="priya@example.com"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
-
+            <div className="grid gap-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? 'Creating account...' : 'Create Account'}
+            </Button>
+            <Button variant="outline" className="w-full" type="button" onClick={handleGoogleSignup}>
+              Sign up with Google
+            </Button>
+          </form>
           <div className="mt-4 text-center text-sm">
             Already have an account?{' '}
             <Link href="/login" className="underline">
