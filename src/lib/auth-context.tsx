@@ -67,20 +67,57 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Listen to profile changes in Firestore
   useEffect(() => {
-    if (firebaseUser) {
-      setIsLoadingProfile(true);
-      const profileRef = doc(firestore, 'users', firebaseUser.uid);
-      const unsubscribe = onSnapshot(profileRef, (doc) => {
-        if (doc.exists()) {
-          setProfile(doc.data() as UserProfile);
-        }
-        setIsLoadingProfile(false);
-      });
-      return () => unsubscribe();
-    } else {
+    if (!firebaseUser) {
       setProfile(null);
       setIsLoadingProfile(false);
+      return;
     }
+
+    setIsLoadingProfile(true);
+    const profileRef = doc(firestore, 'users', firebaseUser.uid);
+
+    // Set up the real-time listener
+    const unsubscribe = onSnapshot(profileRef, (doc) => {
+      if (doc.exists()) {
+        setProfile(doc.data() as UserProfile);
+      }
+      setIsLoadingProfile(false);
+    }, (error) => {
+      console.error("Firestore snapshot error:", error);
+      setIsLoadingProfile(false);
+    });
+
+    // Check if the document exists and create it if not.
+    // This is a one-time "self-healing" check when auth state changes.
+    getDoc(profileRef).then(docSnap => {
+      if (!docSnap.exists()) {
+        const newProfile: UserProfile = {
+          id: firebaseUser.uid,
+          name: firebaseUser.displayName || 'New Volunteer',
+          email: firebaseUser.email || '',
+          role: 'volunteer',
+          avatarUrl: '',
+          skills: [],
+          interests: [],
+          completedEventIds: [],
+          registeredEventIds: [],
+          earnedBadgeIds: [],
+          loggedHours: 0,
+          notifications: [{
+              id: `notif-welcome-${Date.now()}`,
+              title: 'Welcome to Meet A Cause!',
+              description: 'We have set up your profile. Please review it in the settings page.',
+              createdAt: 'Just now',
+              isRead: false,
+          }],
+        };
+        setDoc(profileRef, newProfile).catch(err => {
+            console.error("Failed to auto-create profile:", err);
+        });
+      }
+    });
+
+    return () => unsubscribe();
   }, [firebaseUser, firestore]);
   
   const checkAndUnlockBadges = useCallback(async (user: AppUser): Promise<{ earnedBadgeIds: string[], notifications: Notification[] } | null> => {
