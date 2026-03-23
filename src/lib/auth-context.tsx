@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
@@ -187,7 +188,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     signOut(firebaseAuth);
-    router.push('/login');
+    router.push('/');
   };
 
   const updateUser = async (updatedData: Partial<UserProfile>) => {

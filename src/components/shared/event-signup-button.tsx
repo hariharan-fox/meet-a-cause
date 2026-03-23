@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useAuth } from '@/lib/auth-context';
@@ -16,7 +17,7 @@ export default function EventSignUpButton({ eventId, eventTitle }: { eventId: st
 
   const handleSignUpClick = () => {
     if (!user) {
-      router.push('/login');
+      router.push('/');
       return;
     }
     

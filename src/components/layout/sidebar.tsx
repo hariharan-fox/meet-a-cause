@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -9,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth-context';
 
 const navLinks = [
-    { href: '/', label: 'Dashboard', icon: Home },
+    { href: '/dashboard', label: 'Dashboard', icon: Home },
     { href: '/events', label: 'Events', icon: Calendar },
     { href: '/ngos', label: 'NGOs', icon: Building },
     { href: '/my-impact', label: 'My Badges', icon: Award },
@@ -29,8 +30,8 @@ export default function Sidebar() {
                 <div className="flex-1 py-4 overflow-y-auto">
                     <nav className="grid items-start gap-1 px-2 text-sm font-medium">
                         {navLinks.map((link) => {
-                            const isActive = link.href === '/' 
-                                ? pathname === '/' 
+                            const isActive = link.href === '/dashboard' 
+                                ? pathname === '/dashboard' 
                                 : pathname.startsWith(link.href);
                             return (
                                 <Link

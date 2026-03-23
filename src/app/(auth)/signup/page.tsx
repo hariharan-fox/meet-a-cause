@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -46,7 +47,7 @@ export default function SignupPage() {
     form.clearErrors();
     try {
       await signup(values.name, values.email, values.password);
-      router.push('/');
+      // The client-layout component will handle redirection to /dashboard
     } catch (err: any) {
       console.error("Signup Failed:", err); // Log the full error for debugging
 
@@ -159,7 +160,7 @@ export default function SignupPage() {
           </Form>
           <div className="mt-4 text-center text-sm">
             Already have an account?{' '}
-            <Link href="/login" className="underline">
+            <Link href="/" className="underline">
               Login
             </Link>
           </div>

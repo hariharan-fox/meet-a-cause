@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useEffect } from 'react';
@@ -13,21 +14,25 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const { user, isLoading } = useAuth();
 
-    const isAuthPage = pathname?.startsWith('/login') || pathname?.startsWith('/signup');
-    const isPublicPage = isAuthPage || pathname?.startsWith('/events') || pathname?.startsWith('/ngos');
+    const AUTH_PAGES = ['/', '/login', '/signup'];
+    const PUBLIC_PATHS = ['/events', '/ngos'];
+    const isAuthPage = AUTH_PAGES.includes(pathname!);
+    const isPublicPage = isAuthPage || PUBLIC_PATHS.some(p => pathname!.startsWith(p));
 
     useEffect(() => {
         if (isLoading) return;
 
         if (user) {
-            // If user is logged in, redirect away from auth pages
+            // User is logged in.
+            // If they are on an auth page, redirect to dashboard.
             if (isAuthPage) {
-                router.push('/');
+                router.push('/dashboard');
             }
         } else {
-            // If user is not logged in, protect non-public pages
-            if (!isPublicPage && pathname !== '/') {
-                 router.push('/login');
+            // User is not logged in.
+            // If they are on a protected page, redirect to home/login.
+            if (!isPublicPage) {
+                router.push('/');
             }
         }
     }, [user, isLoading, isPublicPage, isAuthPage, router, pathname]);

@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -87,7 +88,7 @@ export default function Header() {
              <nav className="hidden items-center gap-2 md:flex">
                 <Button variant="ghost" asChild><Link href="/events">Events</Link></Button>
                 <Button variant="ghost" asChild><Link href="/ngos">NGOs</Link></Button>
-                <Button variant="ghost" asChild><Link href="/login">Login</Link></Button>
+                <Button variant="ghost" asChild><Link href="/">Login</Link></Button>
                 <Button asChild><Link href="/signup">Sign Up</Link></Button>
              </nav>
              
@@ -110,7 +111,7 @@ export default function Header() {
                         <Link href="/ngos" className="text-muted-foreground hover:text-foreground">NGOs</Link>
                     </nav>
                     <div className="mt-auto p-4 space-y-4 border-t">
-                        <Button asChild variant="outline" className="w-full"><Link href="/login">Login</Link></Button>
+                        <Button asChild variant="outline" className="w-full"><Link href="/">Login</Link></Button>
                         <Button asChild className="w-full"><Link href="/signup">Sign Up</Link></Button>
                     </div>
                   </SheetContent>
