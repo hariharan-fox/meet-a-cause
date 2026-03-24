@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -49,39 +48,41 @@ export default function SignupPage() {
       await signup(values.name, values.email, values.password);
       // The client-layout component will handle redirection to /dashboard
     } catch (err: any) {
-      console.error("Signup Failed:", err); // Log the full error for debugging
+      console.error("Signup Failed:", err);
 
-      let message = 'Failed to create an account. Please try again.';
-      
-      // Handle Firebase Auth specific errors
       if (err.code) {
         switch (err.code) {
           case 'auth/email-already-in-use':
-            message = 'An account with this email already exists.';
+            form.setError("root.serverError", {
+              type: "email-in-use",
+              message: 'An account with this email already exists.',
+            });
             break;
           case 'auth/weak-password':
-            message = 'Password should be at least 6 characters.';
+            form.setError("password", {
+              type: "manual",
+              message: 'Password should be at least 6 characters.',
+            });
             break;
           case 'auth/invalid-email':
-            message = 'Please enter a valid email address.';
-            break;
-          case 'permission-denied': // Handle Firestore permission errors
-            message = 'There was a problem setting up your profile. Please contact support.';
+            form.setError("email", {
+              type: "manual",
+              message: 'Please enter a valid email address.',
+            });
             break;
           default:
-            // Use the error message from Firebase if available
-            message = err.message || 'An unknown error occurred during signup.';
+            form.setError("root.serverError", {
+              type: "manual",
+              message: err.message || 'An unknown error occurred during signup.',
+            });
             break;
         }
-      } else if (err.message) {
-         // For other types of errors that have a message property
-         message = err.message;
+      } else {
+        form.setError("root.serverError", {
+          type: "manual",
+          message: 'An unknown error occurred. Please try again.',
+        });
       }
-
-      form.setError("root.serverError", {
-        type: "manual",
-        message,
-      });
     } finally {
       setIsLoading(false);
     }
@@ -106,9 +107,16 @@ export default function SignupPage() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                {errors.root?.serverError && (
-                <div className="text-sm text-destructive text-center font-medium bg-destructive/10 p-3 rounded-md flex items-center gap-2 justify-center">
-                  <AlertTriangle className="h-4 w-4" />
-                  {errors.root.serverError.message}
+                <div className="text-sm text-destructive text-center font-medium bg-destructive/10 p-3 rounded-md flex flex-col items-center gap-1 justify-center">
+                  <div className='flex items-center gap-2'>
+                    <AlertTriangle className="h-4 w-4" />
+                    <span>{errors.root.serverError.message}</span>
+                  </div>
+                  {errors.root.serverError.type === 'email-in-use' && (
+                    <Button variant="link" asChild className="h-auto p-0 text-sm text-destructive hover:text-destructive underline">
+                      <Link href="/">Click here to log in instead</Link>
+                    </Button>
+                  )}
                 </div>
               )}
               <FormField
