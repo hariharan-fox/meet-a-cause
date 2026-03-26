@@ -1,0 +1,43 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper function to check ownership
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    match /users/{userId} {
+      allow create: if isOwner(userId)
+                    && request.resource.data.id == userId
+                    && request.resource.data.name is string
+                    && request.resource.data.name.size() > 1
+                    && request.resource.data.role == 'volunteer'
+                    && request.resource.data.avatarUrl is string
+                    && request.resource.data.skills is list && request.resource.data.skills.size() == 0
+                    && request.resource.data.interests is list && request.resource.data.interests.size() == 0
+                    && request.resource.data.loggedHours == 0
+                    && request.resource.data.completedEventIds is list && request.resource.data.completedEventIds.size() == 0
+                    && request.resource.data.registeredEventIds is list && request.resource.data.registeredEventIds.size() == 0
+                    && request.resource.data.earnedBadgeIds is list && request.resource.data.earnedBadgeIds.size() == 0
+                    && request.resource.data.notifications is list && request.resource.data.notifications.size() == 1;
+
+      allow read, update: if isOwner(userId);
+      allow delete: if false;
+    }
+
+    // Public collections for browsing
+    match /events/{eventId} {
+      allow read: if true;
+    }
+
+    match /ngos/{ngoId} {
+      allow read: if true;
+    }
+
+    match /testimonials/{testimonialId} {
+      allow read: if true;
+    }
+  }
+}

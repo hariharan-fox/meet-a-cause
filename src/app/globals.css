@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 14% 96%; /* Silver */
+    --foreground: 240 10% 3.9%; /* Black */
+
+    --card: 220 14% 96%;
+    --card-foreground: 240 10% 3.9%;
+
+    --popover: 220 14% 96%;
+    --popover-foreground: 240 10% 3.9%;
+
+    --primary: 148 62% 40%;      /* Vibrant Emerald */
+    --primary-foreground: 148 15% 95%;
+
+    --secondary: 220 14% 91%;    /* Lighter Silver */
+    --secondary-foreground: 240 10% 3.9%; /* Black */
+
+    --muted: 220 14% 91%;
+    --muted-foreground: 240 3.8% 46.1%; /* Muted Grey */
+
+    --accent: 148 50% 94%;       /* Light Emerald */
+    --accent-foreground: 148 62% 30%; /* Dark Green */
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 220 13% 90%;
+    --input: 220 13% 90%;
+    --ring: 148 62% 40%;
+
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    background-image: radial-gradient(circle at 15% 50%, hsl(var(--primary) / 0.05), transparent 30%),
+                      radial-gradient(circle at 85% 40%, hsl(var(--primary) / 0.05), transparent 30%),
+                      radial-gradient(circle at 50% 95%, hsl(var(--primary) / 0.03), transparent 25%);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-headline;
+  }
+}

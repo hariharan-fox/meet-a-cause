@@ -1,0 +1,118 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero-volunteers",
+      "description": "A group of diverse volunteers working together happily outdoors.",
+      "imageUrl": "https://images.unsplash.com/photo-1758599668178-d9716bbda9d5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHx2b2x1bnRlZXJzJTIwY29tbXVuaXR5fGVufDB8fHx8MTc2ODU2MzQ3OXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "volunteers community"
+    },
+    {
+      "id": "event-beach-cleanup",
+      "description": "Volunteers cleaning up a sandy beach.",
+      "imageUrl": "https://images.unsplash.com/photo-1617953141905-b27fb1f17d88?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxiZWFjaCUyMGNsZWFudXB8ZW58MHx8fHwxNzY4NjExNzA1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "beach cleanup"
+    },
+    {
+      "id": "event-food-drive",
+      "description": "Canned goods and food donations being sorted by volunteers.",
+      "imageUrl": "https://images.unsplash.com/photo-1593113616828-6f22bca04804?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxmb29kJTIwZG9uYXRpb258ZW58MHx8fHwxNzY4NjA0ODg2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "food donation"
+    },
+    {
+      "id": "event-tree-planting",
+      "description": "A person planting a small tree sapling in a field.",
+      "imageUrl": "https://images.unsplash.com/photo-1591255199673-4e2b7f6645a2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHx0cmVlJTIwcGxhbnRpbmd8ZW58MHx8fHwxNzY4NjI1NjYwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "tree planting"
+    },
+    {
+      "id": "event-animal-shelter",
+      "description": "A volunteer petting a dog in an animal shelter.",
+      "imageUrl": "https://images.unsplash.com/photo-1594004844563-536a03a6e532?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxhbmltYWwlMjBzaGVsdGVyfGVufDB8fHx8MTc2ODU2OTc2N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "animal shelter"
+    },
+    {
+      "id": "event-coding-workshop",
+      "description": "People learning to code on laptops in a classroom setting.",
+      "imageUrl": "https://images.unsplash.com/photo-1580982338369-650de7dfdc07?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjb2RpbmclMjB3b3Jrc2hvcHxlbnwwfHx8fDE3Njg2MTE3MDV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "coding workshop"
+    },
+    {
+      "id": "event-mentorship-session",
+      "description": "An older person mentoring a younger person at a desk.",
+      "imageUrl": "https://images.unsplash.com/photo-1758525863537-9d2ec17cb587?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxtZW50b3JzaGlwJTIwc2Vzc2lvbnxlbnwwfHx8fDE3Njg2MjU2NjB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "mentorship session"
+    },
+    {
+      "id": "avatar-ananya-rao",
+      "description": "Avatar for Ananya Rao.",
+      "imageUrl": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxpbmRpYW4lMjB3b21hbiUyMHBvcnRyYWl0fGVufDB8fHx8MTc2ODc5MjM0OXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "indian woman"
+    },
+    {
+      "id": "avatar-rohan-mehta",
+      "description": "Avatar for Rohan Mehta.",
+      "imageUrl": "https://images.unsplash.com/photo-1615109398623-88346a601842?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxpbmRpYW4lMjBtYW4lMjBwb3J0cmFpdHxlbnwwfHx8fDE3Njg3OTI0MTB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "indian man"
+    },
+    {
+      "id": "avatar-priya-sharma",
+      "description": "Avatar for Priya Sharma.",
+      "imageUrl": "https://images.unsplash.com/photo-1506092496291-a8b09386a345?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxpbmRpYW4lMjB5b3VuZyUyMHdvbWFufGVufDB8fHx8MTc2ODgyMTc4Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "indian woman"
+    },
+    {
+      "id": "ngo-green-earth",
+      "description": "Logo for Green Earth Foundation.",
+      "imageUrl": "https://images.unsplash.com/photo-1662027044921-6febc57a0c53?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxuYXR1cmUlMjBsb2dvfGVufDB8fHx8MTc2ODU2NTY0N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "nature logo"
+    },
+    {
+      "id": "ngo-hope-helpers",
+      "description": "Logo for Hope Helpers.",
+      "imageUrl": "https://images.unsplash.com/photo-1653499676737-becf2c9562c8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxjaGFyaXR5JTIwbG9nb3xlbnwwfHx8fDE3Njg1NjUxODN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "charity logo"
+    },
+    {
+      "id": "ngo-tech-forward",
+      "description": "Logo for Tech Forward.",
+      "imageUrl": "https://images.unsplash.com/photo-1662057168152-d5dc088deb25?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHx0ZWNoJTIwbG9nb3xlbnwwfHx8fDE3Njg1MjY5MjZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "tech logo"
+    },
+    {
+      "id": "ngo-animal-allies",
+      "description": "Logo for Animal Allies.",
+      "imageUrl": "https://images.unsplash.com/photo-1654362595375-2e775cb111df?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwYXclMjBsb2dvfGVufDB8fHx8MTc2ODYyNTY2Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "paw logo"
+    },
+    {
+      "id": "avatar-generic-1",
+      "description": "A generic avatar image.",
+      "imageUrl": "https://picsum.photos/seed/101/200/200",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "avatar-generic-2",
+      "description": "A generic avatar image.",
+      "imageUrl": "https://picsum.photos/seed/102/200/200",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "avatar-generic-3",
+      "description": "A generic avatar image.",
+      "imageUrl": "https://picsum.photos/seed/103/200/200",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "avatar-generic-4",
+      "description": "A generic avatar image.",
+      "imageUrl": "https://picsum.photos/seed/104/200/200",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "avatar-generic-5",
+      "description": "A generic avatar image.",
+      "imageUrl": "https://picsum.photos/seed/105/200/200",
+      "imageHint": "person portrait"
+    }
+  ]
+}
