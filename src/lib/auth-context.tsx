@@ -85,13 +85,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (docSnap.exists()) {
         setProfile(docSnap.data() as UserProfile);
       } else {
-        // This case can happen if a user is created in Auth but the Firestore doc creation fails.
-        // We log them out to force a clean login/signup attempt.
+        // This case can happen during signup before the Firestore doc is created,
+        // or if a user exists in Auth but not in Firestore. 
         setProfile(null);
-        if (firebaseUser) { // Avoid warning on initial load/logout
-            console.warn(`Profile for user ${firebaseUser.uid} not found. Forcing logout.`);
-            signOut(firebaseAuth).catch(err => console.error("Sign out error:", err));
-        }
       }
       setIsLoadingProfile(false);
     }, (error) => {
