@@ -1,43 +1,51 @@
-
 'use client';
 
-import { useState, useEffect } from 'react';
-import { allNgos } from "@/lib/placeholder-data";
+import { useState, useEffect, useMemo } from 'react';
+import NgoCard from "@/components/shared/ngo-card";
 import type { NGO } from '@/lib/types';
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
-import NgoCard from "@/components/shared/ngo-card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Search } from "lucide-react";
+import { collection, getDocs } from 'firebase/firestore';
+import { useFirestore } from '@/firebase/provider';
 
 export default function NgosPage() {
+  const [allNgos, setAllNgos] = useState<NGO[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('all');
   const [selectedCause, setSelectedCause] = useState('all');
-  const [filteredNgos, setFilteredNgos] = useState<NGO[]>(allNgos);
+  const db = useFirestore();
 
-  const locations = ['all', ...Array.from(new Set(allNgos.map(ngo => ngo.location)))];
-  const causes = ['all', ...Array.from(new Set(allNgos.flatMap(ngo => ngo.cause)))];
-
+  // Fetch NGOs from Firestore on load
   useEffect(() => {
-    let updatedNgos = allNgos;
+    async function fetchNgos() {
+      try {
+        const snapshot = await getDocs(collection(db, 'ngo_profiles'));
+        const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as NGO[];
+        setAllNgos(data);
+      } catch (err) {
+        console.error('Failed to fetch NGOs:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchNgos();
+  }, [db]);
 
-    if (searchQuery) {
-      updatedNgos = updatedNgos.filter(ngo =>
+  const locations = useMemo(() => ['all', ...Array.from(new Set(allNgos.map(n => n.location)))], [allNgos]);
+  const causes = useMemo(() => ['all', ...Array.from(new Set(allNgos.flatMap(n => n.cause)))], [allNgos]);
+
+  const filteredNgos = useMemo(() => {
+    return allNgos.filter(ngo => {
+      const matchesSearch = !searchQuery ||
         ngo.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        ngo.cause.some(c => c.toLowerCase().includes(searchQuery.toLowerCase()))
-      );
-    }
-
-    if (selectedLocation !== 'all') {
-      updatedNgos = updatedNgos.filter(ngo => ngo.location === selectedLocation);
-    }
-
-    if (selectedCause !== 'all') {
-      updatedNgos = updatedNgos.filter(ngo => ngo.cause.includes(selectedCause));
-    }
-
-    setFilteredNgos(updatedNgos);
-  }, [searchQuery, selectedLocation, selectedCause]);
+        ngo.cause.some(c => c.toLowerCase().includes(searchQuery.toLowerCase()));
+      const matchesLocation = selectedLocation === 'all' || ngo.location === selectedLocation;
+      const matchesCause = selectedCause === 'all' || ngo.cause.includes(selectedCause);
+      return matchesSearch && matchesLocation && matchesCause;
+    });
+  }, [allNgos, searchQuery, selectedLocation, selectedCause]);
 
   return (
     <div className="bg-transparent animate-slide-in-from-bottom">
@@ -85,17 +93,28 @@ export default function NgosPage() {
           </Select>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredNgos.length > 0 ? (
-            filteredNgos.map((ngo) => (
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="h-48 rounded-2xl bg-muted animate-pulse" />
+            ))}
+          </div>
+        ) : filteredNgos.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredNgos.map(ngo => (
               <NgoCard key={ngo.id} ngo={ngo} />
-            ))
-           ) : (
-            <div className="col-span-full text-center text-muted-foreground py-10">
-              <p>No NGOs found matching your criteria.</p>
-            </div>
-           )}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="col-span-full text-center text-muted-foreground bg-accent/50 p-12 rounded-2xl">
+            <h3 className="font-semibold">
+              {allNgos.length === 0 ? 'No NGOs added yet' : 'No NGOs found matching your criteria'}
+            </h3>
+            <p className="text-sm mt-2">
+              {allNgos.length === 0 ? 'Check back soon — organizations are being added!' : 'Try adjusting your filters.'}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
