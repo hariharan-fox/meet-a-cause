@@ -20,6 +20,7 @@ import { useAuth as useFirebaseAuth, useFirestore } from '@/firebase/provider';
 import type { Notification, Certificate } from './types';
 import { useBadgeUnlock } from './badge-unlock-context';
 import { allCertificates } from './placeholder-data';
+import { DEFAULT_THRESHOLDS } from './badge-thresholds';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 
