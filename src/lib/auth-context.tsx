@@ -2,31 +2,40 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { 
-    type User as FirebaseAuthUser, 
-    createUserWithEmailAndPassword, 
-    signInWithEmailAndPassword, 
-    signOut,
-    updateProfile,
-    EmailAuthProvider,
-    reauthenticateWithCredential,
-    updatePassword,
-    deleteUser,
-    sendPasswordResetEmail
+import {
+  type User as FirebaseAuthUser,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  updateProfile,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  updatePassword,
+  deleteUser,
+  sendPasswordResetEmail
 } from 'firebase/auth';
-import { doc, setDoc, getDoc, updateDoc, onSnapshot, deleteDoc } from 'firebase/firestore';
-
+import { doc, setDoc, updateDoc, onSnapshot, deleteDoc, collection, getDocs } from 'firebase/firestore';
 import { useUser as useFirebaseAuthState } from '@/firebase/auth/use-user';
 import { useAuth as useFirebaseAuth, useFirestore } from '@/firebase/provider';
 import type { Notification, Certificate } from './types';
 import { useBadgeUnlock } from './badge-unlock-context';
-import { allCertificates, allEvents } from './placeholder-data';
+import { allCertificates } from './placeholder-data';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 
-// This will be the shape of our user data in Firestore
+// Helper to create a notification object with a real ISO timestamp
+function createNotification(title: string, description: string): Notification {
+  return {
+    id: `notif-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    title,
+    description,
+    createdAt: new Date().toISOString(),
+    isRead: false,
+  };
+}
+
 type UserProfile = {
-  id: string; // This will be the UID from Firebase Auth
+  id: string;
   name: string;
   email: string;
   role: 'volunteer';
@@ -42,7 +51,6 @@ type UserProfile = {
   createdAt: string;
 };
 
-// This is the combined user object we'll use throughout the app
 export type AppUser = UserProfile & {
   auth: FirebaseAuthUser;
 };
@@ -57,6 +65,10 @@ interface AuthContextType {
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   deleteAccount: (reason: string) => Promise<void>;
   sendPasswordReset: (email: string) => Promise<void>;
+  registerForEvent: (eventId: string, eventTitle: string) => Promise<void>;
+  completeEvent: (eventId: string, eventTitle: string, hours: number) => Promise<void>;
+  markNotificationRead: (notificationId: string) => Promise<void>;
+  markAllNotificationsRead: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -70,102 +82,105 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { unlockBadge } = useBadgeUnlock();
 
-  // Listen to profile changes in Firestore
   useEffect(() => {
     if (!firebaseUser) {
       setProfile(null);
       setIsLoadingProfile(false);
       return;
     }
-
     setIsLoadingProfile(true);
     const profileRef = doc(firestore, 'users', firebaseUser.uid);
-
     const unsubscribe = onSnapshot(profileRef, (docSnap) => {
       if (docSnap.exists()) {
         setProfile(docSnap.data() as UserProfile);
       } else {
-        // This case can happen during signup before the Firestore doc is created,
-        // or if a user exists in Auth but not in Firestore. 
         setProfile(null);
       }
       setIsLoadingProfile(false);
     }, (error) => {
-      errorEmitter.emit('permission-error', new FirestorePermissionError({
-        path: profileRef.path,
-        operation: 'get'
-      }));
+      errorEmitter.emit('permission-error', new FirestorePermissionError({ path: profileRef.path, operation: 'get' }));
       setIsLoadingProfile(false);
     });
-
     return () => unsubscribe();
   }, [firebaseUser, firestore, firebaseAuth]);
-  
-  const checkAndUnlockBadges = useCallback(async (user: AppUser): Promise<{ earnedBadgeIds: string[], notifications: Notification[] } | null> => {
+
+  // Check badges using real Firestore events
+  const checkAndUnlockBadges = useCallback(async (
+    user: AppUser,
+    extraNotifications: Notification[] = []
+  ): Promise<{ earnedBadgeIds: string[], notifications: Notification[] } | null> => {
     const newlyEarnedBadges: Certificate[] = [];
     const unearnedBadges = allCertificates.filter(cert => !user.earnedBadgeIds.includes(cert.id));
 
+    // Fetch real events from Firestore for cause-based badge checks
+    let completedEvents: any[] = [];
+    try {
+      const eventsSnap = await getDocs(collection(firestore, 'events'));
+      const allFirestoreEvents = eventsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      completedEvents = allFirestoreEvents.filter(e => user.completedEventIds.includes(e.id));
+    } catch (err) {
+      console.error('Could not fetch events for badge check:', err);
+    }
+
     for (const badge of unearnedBadges) {
-        let isUnlocked = false;
-        const completedEvents = allEvents.filter(event => user.completedEventIds.includes(event.id));
-
-        switch (badge.id) {
-            case 'start-1': case 'event-1':
-                if (user.completedEventIds.length >= 1) isUnlocked = true;
-                break;
-            case 'start-3':
-                if ((user.skills?.length || 0) > 0 && (user.interests?.length || 0) > 0) isUnlocked = true;
-                break;
-            case 'start-4':
-                if (user.phoneNumber) isUnlocked = true;
-                break;
-            case 'event-2': if (user.completedEventIds.length >= 5) isUnlocked = true; break;
-            case 'event-3': if (user.completedEventIds.length >= 15) isUnlocked = true; break;
-            case 'event-4': if (user.completedEventIds.length >= 30) isUnlocked = true; break;
-            case 'hours-1': if (user.loggedHours >= 10) isUnlocked = true; break;
-            case 'hours-2': if (user.loggedHours >= 25) isUnlocked = true; break;
-            case 'hours-3': if (user.loggedHours >= 50) isUnlocked = true; break;
-            case 'hours-4': if (user.loggedHours >= 100) isUnlocked = true; break;
-            case 'cause-env-1': if (completedEvents.filter(e => e.cause === 'Environment').length >= 3) isUnlocked = true; break;
-            case 'cause-env-2': if (completedEvents.filter(e => e.cause === 'Environment').length >= 7) isUnlocked = true; break;
-            case 'cause-env-3': if (completedEvents.filter(e => e.cause === 'Environment').length >= 15) isUnlocked = true; break;
-            case 'cause-comm-1': if (completedEvents.filter(e => e.cause === 'Community').length >= 3) isUnlocked = true; break;
-            case 'cause-comm-2': if (completedEvents.filter(e => e.cause === 'Community').length >= 7) isUnlocked = true; break;
-            case 'cause-comm-3': if (completedEvents.filter(e => e.cause === 'Community').length >= 15) isUnlocked = true; break;
-            case 'cause-animal-1': if (completedEvents.filter(e => e.cause === 'Animals').length >= 3) isUnlocked = true; break;
-            case 'cause-animal-2': if (completedEvents.filter(e => e.cause === 'Animals').length >= 7) isUnlocked = true; break;
-            case 'cause-animal-3': if (completedEvents.filter(e => e.cause === 'Animals').length >= 15) isUnlocked = true; break;
-            case 'cause-edu-1': if (completedEvents.filter(e => e.cause === 'Education').length >= 3) isUnlocked = true; break;
-            case 'cause-edu-2': if (completedEvents.filter(e => e.cause === 'Education').length >= 7) isUnlocked = true; break;
-            case 'cause-edu-3': if (completedEvents.filter(e => e.cause === 'Education').length >= 15) isUnlocked = true; break;
-            case 'diverse-1': if (new Set(completedEvents.map(e => e.cause)).size >= 3) isUnlocked = true; break;
-            case 'diverse-2': if (new Set(completedEvents.map(e => e.cause)).size >= 5) isUnlocked = true; break;
-            case 'diverse-3': if (new Set(completedEvents.map(e => e.cause)).size >= 7) isUnlocked = true; break;
-            case 'special-3': if (new Set(completedEvents.map(e => e.ngoId)).size >= 5) isUnlocked = true; break;
-        }
-
-        if (isUnlocked) {
-            newlyEarnedBadges.push(badge);
-        }
+      let isUnlocked = false;
+      switch (badge.id) {
+        case 'start-1': case 'event-1':
+          if (user.completedEventIds.length >= 1) isUnlocked = true; break;
+        case 'start-3':
+          if ((user.skills?.length || 0) > 0 && (user.interests?.length || 0) > 0) isUnlocked = true; break;
+        case 'start-4':
+          if (user.phoneNumber) isUnlocked = true; break;
+        case 'event-2': if (user.completedEventIds.length >= 5) isUnlocked = true; break;
+        case 'event-3': if (user.completedEventIds.length >= 15) isUnlocked = true; break;
+        case 'event-4': if (user.completedEventIds.length >= 30) isUnlocked = true; break;
+        case 'hours-1': if (user.loggedHours >= 10) isUnlocked = true; break;
+        case 'hours-2': if (user.loggedHours >= 25) isUnlocked = true; break;
+        case 'hours-3': if (user.loggedHours >= 50) isUnlocked = true; break;
+        case 'hours-4': if (user.loggedHours >= 100) isUnlocked = true; break;
+        case 'cause-env-1': if (completedEvents.filter(e => e.cause === 'Environment').length >= 3) isUnlocked = true; break;
+        case 'cause-env-2': if (completedEvents.filter(e => e.cause === 'Environment').length >= 7) isUnlocked = true; break;
+        case 'cause-env-3': if (completedEvents.filter(e => e.cause === 'Environment').length >= 15) isUnlocked = true; break;
+        case 'cause-comm-1': if (completedEvents.filter(e => e.cause === 'Community').length >= 3) isUnlocked = true; break;
+        case 'cause-comm-2': if (completedEvents.filter(e => e.cause === 'Community').length >= 7) isUnlocked = true; break;
+        case 'cause-comm-3': if (completedEvents.filter(e => e.cause === 'Community').length >= 15) isUnlocked = true; break;
+        case 'cause-animal-1': if (completedEvents.filter(e => e.cause === 'Animals').length >= 3) isUnlocked = true; break;
+        case 'cause-animal-2': if (completedEvents.filter(e => e.cause === 'Animals').length >= 7) isUnlocked = true; break;
+        case 'cause-animal-3': if (completedEvents.filter(e => e.cause === 'Animals').length >= 15) isUnlocked = true; break;
+        case 'cause-edu-1': if (completedEvents.filter(e => e.cause === 'Education').length >= 3) isUnlocked = true; break;
+        case 'cause-edu-2': if (completedEvents.filter(e => e.cause === 'Education').length >= 7) isUnlocked = true; break;
+        case 'cause-edu-3': if (completedEvents.filter(e => e.cause === 'Education').length >= 15) isUnlocked = true; break;
+        case 'diverse-1': if (new Set(completedEvents.map(e => e.cause)).size >= 3) isUnlocked = true; break;
+        case 'diverse-2': if (new Set(completedEvents.map(e => e.cause)).size >= 5) isUnlocked = true; break;
+        case 'diverse-3': if (new Set(completedEvents.map(e => e.cause)).size >= 7) isUnlocked = true; break;
+        case 'special-3': if (new Set(completedEvents.map(e => e.ngoId)).size >= 5) isUnlocked = true; break;
+      }
+      if (isUnlocked) newlyEarnedBadges.push(badge);
     }
 
     if (newlyEarnedBadges.length > 0) {
-        unlockBadge(newlyEarnedBadges[0]);
-        const newNotifications = newlyEarnedBadges.map(badge => ({
-             id: `notif-badge-${badge.id}-${Date.now()}`,
-             title: 'New Badge Unlocked!',
-             description: `You've earned the "${badge.name}" badge. Congratulations!`,
-             createdAt: 'Just now',
-             isRead: false,
-        }));
-        
-        return {
-            earnedBadgeIds: [...user.earnedBadgeIds, ...newlyEarnedBadges.map(b => b.id)],
-            notifications: [...newNotifications, ...user.notifications],
-        };
+      unlockBadge(newlyEarnedBadges[0]);
+      const badgeNotifications = newlyEarnedBadges.map(badge =>
+        createNotification(
+          'Badge Unlocked!',
+          `You earned the "${badge.name}" badge. Keep up the great work!`
+        )
+      );
+      return {
+        earnedBadgeIds: [...user.earnedBadgeIds, ...newlyEarnedBadges.map(b => b.id)],
+        notifications: [...badgeNotifications, ...extraNotifications, ...user.notifications],
+      };
     }
+
+    if (extraNotifications.length > 0) {
+      return {
+        earnedBadgeIds: user.earnedBadgeIds,
+        notifications: [...extraNotifications, ...user.notifications],
+      };
+    }
+
     return null;
-  }, [unlockBadge]);
+  }, [unlockBadge, firestore]);
 
   const login = (email: string, password: string) => {
     return signInWithEmailAndPassword(firebaseAuth, email, password).then(() => {});
@@ -174,9 +189,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signup = async (name: string, email: string, password: string) => {
     const userCredential = await createUserWithEmailAndPassword(firebaseAuth, email, password);
     const authUser = userCredential.user;
-
     await updateProfile(authUser, { displayName: name });
-
     const profileRef = doc(firestore, 'users', authUser.uid);
     const newProfile: UserProfile = {
       id: authUser.uid,
@@ -191,25 +204,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       earnedBadgeIds: [],
       loggedHours: 0,
       createdAt: new Date().toISOString(),
-      notifications: [{
-          id: `notif-welcome-${Date.now()}`,
-          title: 'Welcome to Meet A Cause!',
-          description: 'Thank you for joining our community. Explore events and start making an impact!',
-          createdAt: 'Just now',
-          isRead: false,
-      }],
+      notifications: [
+        createNotification(
+          'Welcome to Meet A Cause!',
+          'Thank you for joining. Explore events and start making an impact!'
+        )
+      ],
     };
-    
     try {
-        await setDoc(profileRef, newProfile);
+      await setDoc(profileRef, newProfile);
     } catch (e: any) {
-        errorEmitter.emit('permission-error', new FirestorePermissionError({
-            path: profileRef.path,
-            operation: 'create',
-            requestResourceData: newProfile
-        }));
-        await deleteUser(authUser).catch(console.error);
-        throw e;
+      errorEmitter.emit('permission-error', new FirestorePermissionError({ path: profileRef.path, operation: 'create', requestResourceData: newProfile }));
+      await deleteUser(authUser).catch(console.error);
+      throw e;
     }
   };
 
@@ -217,39 +224,108 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signOut(firebaseAuth).then(() => router.push('/')).catch(console.error);
   };
 
-  const updateUser = async (updatedData: Partial<UserProfile>) => {
+  // Register for an event — adds to registeredEventIds + sends notification
+  const registerForEvent = async (eventId: string, eventTitle: string) => {
     if (!firebaseUser || !profile) return;
-    
     const profileRef = doc(firestore, 'users', firebaseUser.uid);
-    const newProfileState = { ...profile, ...updatedData };
-    
-    const badgeUpdates = await checkAndUnlockBadges({ ...newProfileState, auth: firebaseUser });
-    const finalProfileData = badgeUpdates ? { ...updatedData, ...badgeUpdates } : updatedData;
+    const currentUser = { ...profile, auth: firebaseUser };
 
-    await updateDoc(profileRef, finalProfileData).catch((e: any) => {
-        errorEmitter.emit('permission-error', new FirestorePermissionError({
-            path: profileRef.path,
-            operation: 'update',
-            requestResourceData: finalProfileData
-        }));
-        throw e;
+    const registrationNotification = createNotification(
+      'Event Registration Confirmed',
+      `You are registered for "${eventTitle}". We look forward to seeing you there!`
+    );
+
+    const newRegisteredIds = [...(profile.registeredEventIds || []), eventId];
+    const updatedUser = { ...currentUser, registeredEventIds: newRegisteredIds };
+
+    const badgeUpdates = await checkAndUnlockBadges(updatedUser, [registrationNotification]);
+
+    const updateData: Partial<UserProfile> = {
+      registeredEventIds: newRegisteredIds,
+      ...(badgeUpdates || { notifications: [registrationNotification, ...profile.notifications] }),
+    };
+
+    await updateDoc(profileRef, updateData).catch((e: any) => {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({ path: profileRef.path, operation: 'update' }));
+      throw e;
     });
   };
 
+  // Complete an event — adds to completedEventIds + logs hours + sends notification + checks badges
+  const completeEvent = async (eventId: string, eventTitle: string, hours: number) => {
+    if (!firebaseUser || !profile) return;
+    const profileRef = doc(firestore, 'users', firebaseUser.uid);
+
+    const newCompletedIds = [...(profile.completedEventIds || []), eventId];
+    const newHours = (profile.loggedHours || 0) + hours;
+
+    const completionNotification = createNotification(
+      'Event Completed!',
+      `You completed "${eventTitle}" and logged ${hours} hours. Great work!`
+    );
+
+    const updatedUser = {
+      ...profile,
+      auth: firebaseUser,
+      completedEventIds: newCompletedIds,
+      loggedHours: newHours,
+    };
+
+    const badgeUpdates = await checkAndUnlockBadges(updatedUser, [completionNotification]);
+
+    const updateData: Partial<UserProfile> = {
+      completedEventIds: newCompletedIds,
+      loggedHours: newHours,
+      ...(badgeUpdates || { notifications: [completionNotification, ...profile.notifications] }),
+    };
+
+    await updateDoc(profileRef, updateData).catch((e: any) => {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({ path: profileRef.path, operation: 'update' }));
+      throw e;
+    });
+  };
+
+  const updateUser = async (updatedData: Partial<UserProfile>) => {
+    if (!firebaseUser || !profile) return;
+    const profileRef = doc(firestore, 'users', firebaseUser.uid);
+    const newProfileState = { ...profile, ...updatedData };
+    const badgeUpdates = await checkAndUnlockBadges({ ...newProfileState, auth: firebaseUser });
+    const finalProfileData = badgeUpdates ? { ...updatedData, ...badgeUpdates } : updatedData;
+    await updateDoc(profileRef, finalProfileData).catch((e: any) => {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({ path: profileRef.path, operation: 'update', requestResourceData: finalProfileData }));
+      throw e;
+    });
+  };
+
+  // Mark a single notification as read
+  const markNotificationRead = async (notificationId: string) => {
+    if (!firebaseUser || !profile) return;
+    const profileRef = doc(firestore, 'users', firebaseUser.uid);
+    const updated = profile.notifications.map(n =>
+      n.id === notificationId ? { ...n, isRead: true } : n
+    );
+    await updateDoc(profileRef, { notifications: updated });
+  };
+
+  // Mark all notifications as read
+  const markAllNotificationsRead = async () => {
+    if (!firebaseUser || !profile) return;
+    const profileRef = doc(firestore, 'users', firebaseUser.uid);
+    const updated = profile.notifications.map(n => ({ ...n, isRead: true }));
+    await updateDoc(profileRef, { notifications: updated });
+  };
+
   const changePassword = async (currentPassword: string, newPassword: string) => {
-    if (!firebaseUser || !firebaseUser.email) throw new Error("User not logged in");
-    
+    if (!firebaseUser || !firebaseUser.email) throw new Error('User not logged in');
     const credential = EmailAuthProvider.credential(firebaseUser.email, currentPassword);
     await reauthenticateWithCredential(firebaseUser, credential);
     await updatePassword(firebaseUser, newPassword);
   };
 
   const deleteAccount = async (reason: string) => {
-    if (!firebaseUser) throw new Error("User not logged in");
-    console.log(`Account deletion for ${firebaseUser.uid}, reason:`, reason);
-    
+    if (!firebaseUser) throw new Error('User not logged in');
     const profileRef = doc(firestore, 'users', firebaseUser.uid);
-    await deleteDoc(profileRef).catch(console.error); 
+    await deleteDoc(profileRef).catch(console.error);
     await deleteUser(firebaseUser);
   };
 
@@ -261,7 +337,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isLoading = isAuthLoading || isLoadingProfile;
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout, isLoading, updateUser, changePassword, deleteAccount, sendPasswordReset }}>
+    <AuthContext.Provider value={{
+      user, login, signup, logout, isLoading,
+      updateUser, changePassword, deleteAccount, sendPasswordReset,
+      registerForEvent, completeEvent,
+      markNotificationRead, markAllNotificationsRead,
+    }}>
       {children}
     </AuthContext.Provider>
   );
@@ -269,8 +350,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (context === undefined) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 }
