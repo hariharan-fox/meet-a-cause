@@ -61,14 +61,19 @@ export default function DashboardPage() {
   }, [db, user?.registeredEventIds]);
 
   const stats = useMemo(() => {
-    if (!user) return { hours: 0, completed: 0, badges: 0, causes: 0 };
-    return {
-      hours: user.loggedHours || 0,
-      completed: user.completedEventIds?.length || 0,
-      badges: user.earnedBadgeIds?.length || 0,
-      causes: 0,
-    };
-  }, [user]);
+  if (!user) return { hours: 0, completed: 0, badges: 0, causes: 0 };
+  const completedEventCauses = new Set(
+    featuredEvents
+      .filter(e => user.completedEventIds?.includes(e.id))
+      .map(e => e.cause)
+  );
+  return {
+    hours: user.loggedHours || 0,
+    completed: user.completedEventIds?.length || 0,
+    badges: user.earnedBadgeIds?.length || 0,
+    causes: completedEventCauses.size,
+  };
+}, [user, featuredEvents]);
 
   return (
     <div className="container mx-auto px-4 md:px-6 py-8 space-y-12">
