@@ -162,21 +162,6 @@ export default function DashboardPage() {
             <p className="text-xs text-muted-foreground">{stats.completed > 0 ? 'Thank you!' : "Let's get started."}</p>
           </CardContent>
         </Card>
-        <Card className="hover:bg-accent transition-colors">
-          <Link href="/my-impact">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Badges Earned</CardTitle>
-              <Award className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div className="text-lg font-bold">{stats.badges}</div>
-                <ArrowRight className="h-4 w-4 text-muted-foreground" />
-              </div>
-              <p className="text-xs text-muted-foreground">View all badges</p>
-            </CardContent>
-          </Link>
-        </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Causes Supported</CardTitle>
