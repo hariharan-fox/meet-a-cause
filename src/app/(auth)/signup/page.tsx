@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -15,14 +14,25 @@ import { Logo } from '@/components/shared/logo';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/hooks/use-toast';
 import { AlertTriangle } from 'lucide-react';
-
+import { sanitizeName, sanitizeEmail } from '@/lib/sanitize';
 
 const formSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  email: z.string().email({ message: "Please enter a valid email address." }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
+  name: z
+    .string()
+    .min(2, { message: "Name must be at least 2 characters." })
+    .max(100, { message: "Name must be under 100 characters." })
+    .regex(/^[a-zA-Z\s\-'\.]+$/, { message: "Name can only contain letters, spaces, hyphens and apostrophes." }),
+  email: z
+    .string()
+    .email({ message: "Please enter a valid email address." })
+    .max(254, { message: "Email is too long." }),
+  password: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters." })
+    .max(128, { message: "Password is too long." })
+    .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter." })
+    .regex(/[0-9]/, { message: "Password must contain at least one number." }),
 });
-
 
 export default function SignupPage() {
   const { signup } = useAuth();
@@ -32,11 +42,7 @@ export default function SignupPage() {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-    },
+    defaultValues: { name: "", email: "", password: "" },
   });
 
   const { errors } = form.formState;
@@ -45,55 +51,39 @@ export default function SignupPage() {
     setIsLoading(true);
     form.clearErrors();
     try {
-      await signup(values.name, values.email, values.password);
-      // The client-layout component will handle redirection to /dashboard
-    } catch (err: any) {
-      console.error("Signup Failed:", err);
+      // Sanitize before sending to Firebase
+      const cleanName = sanitizeName(values.name);
+      const cleanEmail = sanitizeEmail(values.email);
 
-      if (err.code) {
-        switch (err.code) {
-          case 'auth/email-already-in-use':
-            form.setError("root.serverError", {
-              type: "email-in-use",
-              message: 'An account with this email already exists.',
-            });
-            break;
-          case 'auth/weak-password':
-            form.setError("password", {
-              type: "manual",
-              message: 'Password should be at least 6 characters.',
-            });
-            break;
-          case 'auth/invalid-email':
-            form.setError("email", {
-              type: "manual",
-              message: 'Please enter a valid email address.',
-            });
-            break;
-          default:
-            form.setError("root.serverError", {
-              type: "manual",
-              message: err.message || 'An unknown error occurred during signup.',
-            });
-            break;
-        }
-      } else {
-        form.setError("root.serverError", {
-          type: "manual",
-          message: 'An unknown error occurred. Please try again.',
-        });
+      if (!cleanName) {
+        form.setError('name', { message: 'Please enter a valid name.' });
+        return;
+      }
+
+      await signup(cleanName, cleanEmail, values.password);
+    } catch (err: any) {
+      switch (err.code) {
+        case 'auth/email-already-in-use':
+          form.setError("root.serverError", {
+            type: "email-in-use",
+            message: 'An account with this email already exists.',
+          });
+          break;
+        case 'auth/weak-password':
+          form.setError("password", { message: 'Password is too weak.' });
+          break;
+        case 'auth/invalid-email':
+          form.setError("email", { message: 'Please enter a valid email address.' });
+          break;
+        default:
+          form.setError("root.serverError", {
+            message: 'An error occurred. Please try again.',
+          });
       }
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleGoogleSignup = () => {
-    toast({
-      title: 'Feature Coming Soon!',
-      description: 'Google sign-up is not yet available but will be in a future update.',
-    });
-  };
+  }
 
   return (
     <div className="flex min-h-[calc(100vh-10rem)] items-center justify-center p-4">
@@ -106,14 +96,14 @@ export default function SignupPage() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-               {errors.root?.serverError && (
-                <div className="text-sm text-destructive text-center font-medium bg-destructive/10 p-3 rounded-md flex flex-col items-center gap-1 justify-center">
-                  <div className='flex items-center gap-2'>
+              {errors.root?.serverError && (
+                <div className="text-sm text-destructive text-center font-medium bg-destructive/10 p-3 rounded-md flex flex-col items-center gap-1">
+                  <div className="flex items-center gap-2">
                     <AlertTriangle className="h-4 w-4" />
                     <span>{errors.root.serverError.message}</span>
                   </div>
                   {errors.root.serverError.type === 'email-in-use' && (
-                    <Button variant="link" asChild className="h-auto p-0 text-sm text-destructive hover:text-destructive underline">
+                    <Button variant="link" asChild className="h-auto p-0 text-sm text-destructive underline">
                       <Link href="/">Click here to log in instead</Link>
                     </Button>
                   )}
@@ -126,7 +116,7 @@ export default function SignupPage() {
                   <FormItem>
                     <FormLabel>Full Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Priya Sharma" {...field} />
+                      <Input placeholder="Priya Sharma" {...field} maxLength={100} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -139,7 +129,7 @@ export default function SignupPage() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="priya@example.com" {...field} />
+                      <Input placeholder="priya@example.com" {...field} maxLength={254} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -152,8 +142,9 @@ export default function SignupPage() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} />
+                      <Input type="password" {...field} maxLength={128} />
                     </FormControl>
+                    <p className="text-xs text-muted-foreground">Min 8 characters, one uppercase, one number.</p>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -161,16 +152,11 @@ export default function SignupPage() {
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? 'Creating account...' : 'Create Account'}
               </Button>
-              <Button variant="outline" className="w-full" type="button" onClick={handleGoogleSignup}>
-                Sign up with Google
-              </Button>
             </form>
           </Form>
           <div className="mt-4 text-center text-sm">
             Already have an account?{' '}
-            <Link href="/" className="underline">
-              Login
-            </Link>
+            <Link href="/" className="underline">Login</Link>
           </div>
         </CardContent>
       </Card>
