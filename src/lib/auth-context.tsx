@@ -24,7 +24,6 @@ import { DEFAULT_THRESHOLDS } from './badge-thresholds';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 
-// Helper to create a notification object with a real ISO timestamp
 function createNotification(title: string, description: string): Notification {
   return {
     id: `notif-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
@@ -40,6 +39,7 @@ type UserProfile = {
   name: string;
   email: string;
   role: 'volunteer';
+  status?: 'active' | 'banned';
   avatarUrl?: string;
   phoneNumber?: string;
   skills?: string[];
@@ -62,6 +62,7 @@ interface AuthContextType {
   signup: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
+  isBanned: boolean;
   updateUser: (updatedData: Partial<UserProfile>) => Promise<void>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   deleteAccount: (reason: string) => Promise<void>;
@@ -80,12 +81,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const firestore = useFirestore();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+  const [isBanned, setIsBanned] = useState(false);
   const router = useRouter();
   const { unlockBadge } = useBadgeUnlock();
 
   useEffect(() => {
     if (!firebaseUser) {
       setProfile(null);
+      setIsBanned(false);
       setIsLoadingProfile(false);
       return;
     }
@@ -93,7 +96,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const profileRef = doc(firestore, 'users', firebaseUser.uid);
     const unsubscribe = onSnapshot(profileRef, (docSnap) => {
       if (docSnap.exists()) {
-        setProfile(docSnap.data() as UserProfile);
+        const data = docSnap.data() as UserProfile;
+        setProfile(data);
+        // Check ban status in real-time
+        if (data.status === 'banned') {
+          setIsBanned(true);
+          // Sign them out of Firebase Auth too
+          signOut(firebaseAuth).then(() => router.push('/banned'));
+        } else {
+          setIsBanned(false);
+        }
       } else {
         setProfile(null);
       }
@@ -103,9 +115,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoadingProfile(false);
     });
     return () => unsubscribe();
-  }, [firebaseUser, firestore, firebaseAuth]);
+  }, [firebaseUser, firestore, firebaseAuth, router]);
 
-  // Check badges using real Firestore events
   const checkAndUnlockBadges = useCallback(async (
     user: AppUser,
     extraNotifications: Notification[] = []
@@ -113,7 +124,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const newlyEarnedBadges: Certificate[] = [];
     const unearnedBadges = allCertificates.filter(cert => !user.earnedBadgeIds.includes(cert.id));
 
-    // Fetch real events from Firestore for cause-based badge checks
     let completedEvents: any[] = [];
     try {
       const eventsSnap = await getDocs(collection(firestore, 'events'));
@@ -126,12 +136,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     for (const badge of unearnedBadges) {
       let isUnlocked = false;
       switch (badge.id) {
-        case 'start-1': case 'event-1':
-          if (user.completedEventIds.length >= 1) isUnlocked = true; break;
-        case 'start-3':
-          if ((user.skills?.length || 0) > 0 && (user.interests?.length || 0) > 0) isUnlocked = true; break;
-        case 'start-4':
-          if (user.phoneNumber) isUnlocked = true; break;
+        case 'start-1': case 'event-1': if (user.completedEventIds.length >= 1) isUnlocked = true; break;
+        case 'start-3': if ((user.skills?.length || 0) > 0 && (user.interests?.length || 0) > 0) isUnlocked = true; break;
+        case 'start-4': if (user.phoneNumber) isUnlocked = true; break;
         case 'event-2': if (user.completedEventIds.length >= 5) isUnlocked = true; break;
         case 'event-3': if (user.completedEventIds.length >= 15) isUnlocked = true; break;
         case 'event-4': if (user.completedEventIds.length >= 30) isUnlocked = true; break;
@@ -162,10 +169,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (newlyEarnedBadges.length > 0) {
       unlockBadge(newlyEarnedBadges[0]);
       const badgeNotifications = newlyEarnedBadges.map(badge =>
-        createNotification(
-          'Badge Unlocked!',
-          `You earned the "${badge.name}" badge. Keep up the great work!`
-        )
+        createNotification('Badge Unlocked!', `You earned the "${badge.name}" badge. Keep up the great work!`)
       );
       return {
         earnedBadgeIds: [...user.earnedBadgeIds, ...newlyEarnedBadges.map(b => b.id)],
@@ -183,8 +187,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return null;
   }, [unlockBadge, firestore]);
 
-  const login = (email: string, password: string) => {
-    return signInWithEmailAndPassword(firebaseAuth, email, password).then(() => {});
+  const login = async (email: string, password: string) => {
+    const credential = await signInWithEmailAndPassword(firebaseAuth, email, password);
+    // Check ban status immediately after login
+    const profileRef = doc(firestore, 'users', credential.user.uid);
+    const profileSnap = await profileRef.get?.() ?? null;
+    // onSnapshot will handle the ban redirect automatically
   };
 
   const signup = async (name: string, email: string, password: string) => {
@@ -197,6 +205,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       name,
       email,
       role: 'volunteer',
+      status: 'active',
       avatarUrl: '',
       skills: [],
       interests: [],
@@ -206,10 +215,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       loggedHours: 0,
       createdAt: new Date().toISOString(),
       notifications: [
-        createNotification(
-          'Welcome to Meet A Cause!',
-          'Thank you for joining. Explore events and start making an impact!'
-        )
+        createNotification('Welcome to Meet A Cause!', 'Thank you for joining. Explore events and start making an impact!')
       ],
     };
     try {
@@ -225,61 +231,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signOut(firebaseAuth).then(() => router.push('/')).catch(console.error);
   };
 
-  // Register for an event — adds to registeredEventIds + sends notification
   const registerForEvent = async (eventId: string, eventTitle: string) => {
     if (!firebaseUser || !profile) return;
     const profileRef = doc(firestore, 'users', firebaseUser.uid);
     const currentUser = { ...profile, auth: firebaseUser };
-
     const registrationNotification = createNotification(
       'Event Registration Confirmed',
       `You are registered for "${eventTitle}". We look forward to seeing you there!`
     );
-
     const newRegisteredIds = [...(profile.registeredEventIds || []), eventId];
     const updatedUser = { ...currentUser, registeredEventIds: newRegisteredIds };
-
     const badgeUpdates = await checkAndUnlockBadges(updatedUser, [registrationNotification]);
-
     const updateData: Partial<UserProfile> = {
       registeredEventIds: newRegisteredIds,
       ...(badgeUpdates || { notifications: [registrationNotification, ...profile.notifications] }),
     };
-
     await updateDoc(profileRef, updateData).catch((e: any) => {
       errorEmitter.emit('permission-error', new FirestorePermissionError({ path: profileRef.path, operation: 'update' }));
       throw e;
     });
   };
 
-  // Complete an event — adds to completedEventIds + logs hours + sends notification + checks badges
   const completeEvent = async (eventId: string, eventTitle: string, hours: number) => {
     if (!firebaseUser || !profile) return;
     const profileRef = doc(firestore, 'users', firebaseUser.uid);
-
     const newCompletedIds = [...(profile.completedEventIds || []), eventId];
     const newHours = (profile.loggedHours || 0) + hours;
-
     const completionNotification = createNotification(
       'Event Completed!',
       `You completed "${eventTitle}" and logged ${hours} hours. Great work!`
     );
-
-    const updatedUser = {
-      ...profile,
-      auth: firebaseUser,
-      completedEventIds: newCompletedIds,
-      loggedHours: newHours,
-    };
-
+    const updatedUser = { ...profile, auth: firebaseUser, completedEventIds: newCompletedIds, loggedHours: newHours };
     const badgeUpdates = await checkAndUnlockBadges(updatedUser, [completionNotification]);
-
     const updateData: Partial<UserProfile> = {
       completedEventIds: newCompletedIds,
       loggedHours: newHours,
       ...(badgeUpdates || { notifications: [completionNotification, ...profile.notifications] }),
     };
-
     await updateDoc(profileRef, updateData).catch((e: any) => {
       errorEmitter.emit('permission-error', new FirestorePermissionError({ path: profileRef.path, operation: 'update' }));
       throw e;
@@ -298,17 +286,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  // Mark a single notification as read
   const markNotificationRead = async (notificationId: string) => {
     if (!firebaseUser || !profile) return;
     const profileRef = doc(firestore, 'users', firebaseUser.uid);
-    const updated = profile.notifications.map(n =>
-      n.id === notificationId ? { ...n, isRead: true } : n
-    );
+    const updated = profile.notifications.map(n => n.id === notificationId ? { ...n, isRead: true } : n);
     await updateDoc(profileRef, { notifications: updated });
   };
 
-  // Mark all notifications as read
   const markAllNotificationsRead = async () => {
     if (!firebaseUser || !profile) return;
     const profileRef = doc(firestore, 'users', firebaseUser.uid);
@@ -339,7 +323,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider value={{
-      user, login, signup, logout, isLoading,
+      user, login, signup, logout, isLoading, isBanned,
       updateUser, changePassword, deleteAccount, sendPasswordReset,
       registerForEvent, completeEvent,
       markNotificationRead, markAllNotificationsRead,
