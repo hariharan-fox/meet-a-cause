@@ -7,14 +7,22 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
-import { CheckCircle, Clock, Award, Users, ArrowRight } from 'lucide-react';
+import { CheckCircle, Clock, Users, ArrowRight, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth-context';
-import { collection, getDocs, query, where, limit, doc, getDoc } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { useFirestore } from '@/firebase/provider';
 import type { Event, NGO } from '@/lib/types';
 import EventCard from '@/components/shared/event-card';
 import NgoCard from '@/components/shared/ngo-card';
+
+type Banner = {
+  id: string;
+  title: string;
+  subtitle?: string;
+  imageUrl: string;
+  linkUrl?: string;
+};
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -23,32 +31,40 @@ export default function DashboardPage() {
     Autoplay({ delay: 5000, stopOnInteraction: false, stopOnMouseEnter: true })
   );
 
-  const [carouselEvents, setCarouselEvents] = useState<Event[]>([]);
+  const [banners, setBanners] = useState<Banner[]>([]);
   const [featuredEvents, setFeaturedEvents] = useState<Event[]>([]);
   const [featuredNgos, setFeaturedNgos] = useState<NGO[]>([]);
   const [upcomingCommitments, setUpcomingCommitments] = useState<Event[]>([]);
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        // Fetch events for carousel (latest 4)
-        const eventsSnap = await getDocs(collection(db, 'events'));
-        const allEvents = eventsSnap.docs.map(d => ({ id: d.id, ...d.data() })) as Event[];
+        // Fetch banners from Firestore (max 4)
+        const bannersSnap = await getDocs(collection(db, 'banners'));
+        const allBanners = bannersSnap.docs
+          .map(d => ({ id: d.id, ...d.data() } as Banner))
+          .filter(b => b.imageUrl)
+          .slice(0, 4);
+        setBanners(allBanners);
 
-        setCarouselEvents(allEvents.slice(0, 4));
-        setFeaturedEvents(allEvents.slice(0, 4));
+        // Fetch events
+        const eventsSnap = await getDocs(collection(db, 'events'));
+        const events = eventsSnap.docs.map(d => ({ id: d.id, ...d.data() })) as Event[];
+        setAllEvents(events);
+        setFeaturedEvents(events.slice(0, 4));
 
         // Fetch NGOs
         const ngosSnap = await getDocs(collection(db, 'ngo_profiles'));
-        const allNgos = ngosSnap.docs.map(d => ({ id: d.id, ...d.data() })) as NGO[];
-        setFeaturedNgos(allNgos.slice(0, 4));
+        const ngos = ngosSnap.docs.map(d => ({ id: d.id, ...d.data() })) as NGO[];
+        setFeaturedNgos(ngos.slice(0, 4));
 
-        // Fetch upcoming commitments for this user
+        // Upcoming commitments
         if (user?.registeredEventIds?.length) {
-          const committed = allEvents.filter(e =>
-            user.registeredEventIds.includes(e.id)
-          ).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+          const committed = events
+            .filter(e => user.registeredEventIds.includes(e.id))
+            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
           setUpcomingCommitments(committed);
         }
       } catch (err) {
@@ -61,19 +77,27 @@ export default function DashboardPage() {
   }, [db, user?.registeredEventIds]);
 
   const stats = useMemo(() => {
-  if (!user) return { hours: 0, completed: 0, badges: 0, causes: 0 };
-  const completedEventCauses = new Set(
-    featuredEvents
-      .filter(e => user.completedEventIds?.includes(e.id))
-      .map(e => e.cause)
-  );
-  return {
-    hours: user.loggedHours || 0,
-    completed: user.completedEventIds?.length || 0,
-    badges: user.earnedBadgeIds?.length || 0,
-    causes: completedEventCauses.size,
-  };
-}, [user, featuredEvents]);
+    if (!user) return { hours: 0, completed: 0, causes: 0 };
+    const completedEventCauses = new Set(
+      allEvents
+        .filter(e => user.completedEventIds?.includes(e.id))
+        .map(e => e.cause)
+    );
+    return {
+      hours: user.loggedHours || 0,
+      completed: user.completedEventIds?.length || 0,
+      causes: completedEventCauses.size,
+    };
+  }, [user, allEvents]);
+
+  // Carousel shows banners if available, falls back to events
+  const carouselItems = banners.length > 0 ? banners : featuredEvents.slice(0, 4).map(e => ({
+    id: e.id,
+    title: e.title,
+    subtitle: e.description?.substring(0, 100),
+    imageUrl: e.imageUrl || '',
+    linkUrl: `/events/${e.id}`,
+  }));
 
   return (
     <div className="container mx-auto px-4 md:px-6 py-8 space-y-12">
@@ -91,57 +115,44 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Carousel */}
-      {!isLoading && carouselEvents.length > 0 && (
+      {/* Banner / Event Carousel */}
+      {isLoading ? (
+        <div className="aspect-[16/7] w-full rounded-2xl bg-muted animate-pulse" />
+      ) : carouselItems.length > 0 ? (
         <section className="animate-slide-in-from-bottom">
           <Carousel
             plugins={[plugin.current]}
             className="w-full"
-            opts={{ align: 'start', loop: true }}
+            opts={{ align: 'start', loop: carouselItems.length > 1 }}
           >
             <CarouselContent>
-              {carouselEvents.map((event) => (
-                <CarouselItem key={event.id} className="lg:basis-1/2">
-                  <Link href={`/events/${event.id}`}>
-                    <div className="relative aspect-[16/7] w-full rounded-2xl overflow-hidden group bg-muted">
-                      {event.imageUrl && (
-                        <Image
-                          src={event.imageUrl}
-                          alt={event.title}
-                          fill
-                          className="object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-6 md:p-8 flex flex-col justify-end">
-                        <h2 className="text-base md:text-lg font-bold text-white">{event.title}</h2>
-                        <p className="text-sm text-white/90 mt-2 max-w-lg hidden md:block">
-                          {event.description?.substring(0, 100)}...
-                        </p>
-                        <Button variant="secondary" size="sm" className="mt-4 w-fit">
-                          View Event <ArrowRight className="ml-2 h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </Link>
+              {carouselItems.map((item) => (
+                <CarouselItem key={item.id} className={carouselItems.length > 1 ? 'lg:basis-1/2' : ''}>
+                  {item.linkUrl ? (
+                    <Link href={item.linkUrl}>
+                      <CarouselCard item={item} />
+                    </Link>
+                  ) : (
+                    <CarouselCard item={item} />
+                  )}
                 </CarouselItem>
               ))}
             </CarouselContent>
           </Carousel>
+          {banners.length > 0 && (
+            <p className="text-[10px] text-muted-foreground text-center mt-2">
+              {banners.length} banner{banners.length > 1 ? 's' : ''} — managed from admin panel
+            </p>
+          )}
         </section>
-      )}
-
-      {isLoading && (
-        <div className="aspect-[16/7] w-full rounded-2xl bg-muted animate-pulse" />
-      )}
-
-      {!isLoading && carouselEvents.length === 0 && (
+      ) : (
         <div className="aspect-[16/7] w-full rounded-2xl bg-muted/50 flex items-center justify-center text-muted-foreground text-sm">
           No events yet. Check back soon.
         </div>
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 animate-slide-in-from-bottom">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 animate-slide-in-from-bottom">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Hours Logged</CardTitle>
@@ -177,7 +188,6 @@ export default function DashboardPage() {
       {/* Featured Content + Upcoming */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-slide-in-from-bottom">
         <div className="lg:col-span-2 space-y-8">
-
           <section>
             <h2 className="text-xl font-bold mb-4">Featured Events</h2>
             {isLoading ? (
@@ -211,7 +221,6 @@ export default function DashboardPage() {
               </div>
             )}
           </section>
-
         </div>
 
         {/* Upcoming Commitments */}
@@ -246,6 +255,36 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// Reusable carousel card component
+function CarouselCard({ item }: { item: { title: string; subtitle?: string; imageUrl: string; linkUrl?: string } }) {
+  return (
+    <div className="relative aspect-[16/7] w-full rounded-2xl overflow-hidden group bg-muted">
+      {item.imageUrl && (
+        <Image
+          src={item.imageUrl}
+          alt={item.title}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-6 md:p-8 flex flex-col justify-end">
+        <h2 className="text-base md:text-lg font-bold text-white">{item.title}</h2>
+        {item.subtitle && (
+          <p className="text-sm text-white/90 mt-2 max-w-lg hidden md:block">
+            {item.subtitle}...
+          </p>
+        )}
+        {item.linkUrl && (
+          <Button variant="secondary" size="sm" className="mt-4 w-fit">
+            {item.linkUrl.startsWith('/events') ? 'View Event' : 'Learn More'}
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        )}
       </div>
     </div>
   );
