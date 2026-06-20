@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect } from 'react';
@@ -10,63 +9,56 @@ import BottomNav from './bottom-nav';
 import Footer from './footer';
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
-    const pathname = usePathname();
-    const router = useRouter();
-    const { user, isLoading } = useAuth();
+  const pathname = usePathname();
+  const router = useRouter();
+  const { user, isLoading } = useAuth();
 
-    const AUTH_PAGES = ['/', '/login', '/signup'];
-    const PUBLIC_PATHS = ['/events', '/ngos', '/banned'];
-    
-    // Safety check for null pathname
-    const isAuthPage = pathname ? AUTH_PAGES.includes(pathname) : false;
-    const isPublicPage = pathname ? (isAuthPage || PUBLIC_PATHS.some(p => pathname.startsWith(p))) : true;
+  const AUTH_PAGES = ['/login', '/signup'];
+  const PUBLIC_PATHS = ['/', '/events', '/ngos', '/banned', '/for-ngos'];
 
-    useEffect(() => {
-        if (isLoading) return;
+  const isAuthPage = pathname ? AUTH_PAGES.includes(pathname) : false;
+  const isPublicPage = pathname ? (isAuthPage || PUBLIC_PATHS.some(p => pathname.startsWith(p))) : true;
 
-        if (user) {
-            // User is logged in.
-            // If they are on an auth page, redirect to dashboard.
-            if (isAuthPage) {
-                router.push('/dashboard');
-            }
-        } else {
-            // User is not logged in.
-            // If they are on a protected page, redirect to home/login.
-            if (!isPublicPage) {
-                router.push('/');
-            }
-        }
-    }, [user, isLoading, isPublicPage, isAuthPage, router, pathname]);
-
-    if (isLoading && !user) {
-        return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-    }
-
+  useEffect(() => {
+    if (isLoading) return;
     if (user) {
-        // Authenticated user layout
-        return (
-            <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-                <Sidebar />
-                <div className="flex flex-col">
-                    <Header />
-                    <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 pb-20 md:pb-6">
-                        {children}
-                    </main>
-                </div>
-                <BottomNav />
-            </div>
-        );
+      if (isAuthPage) {
+        router.push('/dashboard');
+      }
+    } else {
+      if (!isPublicPage) {
+        router.push('/login');
+      }
     }
-    
-    // Public/Auth layout for unauthenticated users
+  }, [user, isLoading, isPublicPage, isAuthPage, router, pathname]);
+
+  if (isLoading && !user) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
+  if (user) {
     return (
-        <div className="flex flex-col min-h-screen">
-            {!isAuthPage && <Header />}
-            <main className="flex-1">
-                {children}
-            </main>
-            {!isAuthPage && <Footer />}
+      <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+        <Sidebar />
+        <div className="flex flex-col">
+          <Header />
+          <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 pb-20 md:pb-6">
+            {children}
+          </main>
         </div>
+        <BottomNav />
+      </div>
     );
+  }
+
+  // Public layout — show header/footer everywhere except auth pages
+  return (
+    <div className="flex flex-col min-h-screen">
+      {!isAuthPage && <Header />}
+      <main className="flex-1">
+        {children}
+      </main>
+      {!isAuthPage && <Footer />}
+    </div>
+  );
 }
