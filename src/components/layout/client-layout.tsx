@@ -15,7 +15,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     const { user, isLoading } = useAuth();
 
     const AUTH_PAGES = ['/', '/login', '/signup'];
-    const PUBLIC_PATHS = ['/events', '/ngos'];
+    const PUBLIC_PATHS = ['/events', '/ngos', '/banned'];
     
     // Safety check for null pathname
     const isAuthPage = pathname ? AUTH_PAGES.includes(pathname) : false;
