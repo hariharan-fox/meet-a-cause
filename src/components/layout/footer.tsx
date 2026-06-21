@@ -9,24 +9,23 @@ export default function Footer() {
           <div className="space-y-4">
             <Logo />
             <p className="text-sm text-muted-foreground">
-              Connecting volunteers with NGOs for a better world.
+              Real events. Real people. Things that are actually worth showing up for.
             </p>
           </div>
           <div className="space-y-2">
             <h4 className="font-semibold">Quick Links</h4>
             <ul className="space-y-1">
               <li><Link href="/events" className="text-sm text-muted-foreground hover:text-foreground">Events</Link></li>
-              <li><Link href="/ngos" className="text-sm text-muted-foreground hover:text-foreground">NGOs</Link></li>
-              <li><Link href="/" className="text-sm text-muted-foreground hover:text-foreground">Dashboard</Link></li>
-              <li><Link href="/about" className="text-sm text-muted-foreground hover:text-foreground">About Us</Link></li>
+              <li><Link href="/ngos" className="text-sm text-muted-foreground hover:text-foreground">Organisations</Link></li>
+              <li><Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground">Dashboard</Link></li>
             </ul>
           </div>
           <div className="space-y-2">
-            <h4 className="font-semibold">For NGOs</h4>
+            <h4 className="font-semibold">For Organisations</h4>
             <ul className="space-y-1">
-              <li><Link href="/signup" className="text-sm text-muted-foreground hover:text-foreground">Register</Link></li>
-              <li><Link href="/best-practices" className="text-sm text-muted-foreground hover:text-foreground">Best Practices</Link></li>
+              <li><Link href="/for-ngos" className="text-sm text-muted-foreground hover:text-foreground">Get listed</Link></li>
               <li><Link href="/support" className="text-sm text-muted-foreground hover:text-foreground">Support</Link></li>
+              <li><a href="mailto:hello@meetacause.in" className="text-sm text-muted-foreground hover:text-foreground">hello@meetacause.in</a></li>
             </ul>
           </div>
           <div className="space-y-2">
