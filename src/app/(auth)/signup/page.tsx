@@ -15,9 +15,12 @@ import { useAuth } from '@/lib/auth-context';
 import { sanitizeName, sanitizeEmail } from '@/lib/sanitize';
 
 const formSchema = z.object({
-  name: z.string().min(2, { message: 'Name must be at least 2 characters.' }).max(100).regex(/^[a-zA-Z\s\-'\.]+$/, { message: 'Name can only contain letters, spaces, hyphens and apostrophes.' }),
+  name: z.string().min(2, { message: 'Name must be at least 2 characters.' }).max(100)
+    .regex(/^[a-zA-Z\s\-'\.]+$/, { message: 'Name can only contain letters, spaces, hyphens and apostrophes.' }),
   email: z.string().email({ message: 'Please enter a valid email address.' }).max(254),
-  password: z.string().min(8, { message: 'Password must be at least 8 characters.' }).max(128).regex(/[A-Z]/, { message: 'Must contain at least one uppercase letter.' }).regex(/[0-9]/, { message: 'Must contain at least one number.' }),
+  password: z.string().min(8, { message: 'Password must be at least 8 characters.' }).max(128)
+    .regex(/[A-Z]/, { message: 'Must contain at least one uppercase letter.' })
+    .regex(/[0-9]/, { message: 'Must contain at least one number.' }),
 });
 
 export default function SignupPage() {
@@ -59,8 +62,8 @@ export default function SignupPage() {
       <Card className="mx-auto max-w-sm w-full">
         <CardHeader className="text-center">
           <Logo className="justify-center mb-2" />
-          <CardTitle className="text-lg">Create a Volunteer Account</CardTitle>
-          <CardDescription>Enter your details to join the community.</CardDescription>
+          <CardTitle className="text-lg">Join Meet A Cause</CardTitle>
+          <CardDescription>Create your account and start showing up.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -73,7 +76,7 @@ export default function SignupPage() {
                   </div>
                   {errors.root.serverError.type === 'email-in-use' && (
                     <Button variant="link" asChild className="h-auto p-0 text-sm text-destructive underline">
-                      <Link href="/">Click here to log in instead</Link>
+                      <Link href="/login">Click here to log in instead</Link>
                     </Button>
                   )}
                 </div>
@@ -114,7 +117,8 @@ export default function SignupPage() {
             </form>
           </Form>
           <div className="mt-4 text-center text-sm">
-            Already have an account? <Link href="/" className="underline">Login</Link>
+            Already have an account?{' '}
+            <Link href="/login" className="underline">Log in</Link>
           </div>
         </CardContent>
       </Card>
