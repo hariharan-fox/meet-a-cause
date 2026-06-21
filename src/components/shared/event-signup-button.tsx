@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { UserPlus, CheckCircle, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -16,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { AuthModal } from '@/components/shared/auth-modal';
 
 export default function EventSignUpButton({
   eventId,
@@ -25,10 +25,10 @@ export default function EventSignUpButton({
   eventTitle: string;
 }) {
   const { user, registerForEvent, completeEvent } = useAuth();
-  const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [hoursInput, setHoursInput] = useState('4');
 
   const isRegistered = user?.registeredEventIds?.includes(eventId);
@@ -36,7 +36,7 @@ export default function EventSignUpButton({
 
   const handleRegister = async () => {
     if (!user) {
-      router.push('/');
+      setIsAuthModalOpen(true);
       return;
     }
     setIsLoading(true);
@@ -109,12 +109,12 @@ export default function EventSignUpButton({
             <DialogHeader>
               <DialogTitle>Mark Event as Completed</DialogTitle>
               <DialogDescription>
-                How many hours did you volunteer at "{eventTitle}"?
+                How many hours did you spend at &quot;{eventTitle}&quot;?
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="hours">Hours Volunteered</Label>
+                <Label htmlFor="hours">Hours</Label>
                 <Input
                   id="hours"
                   type="number"
@@ -125,7 +125,7 @@ export default function EventSignUpButton({
                   placeholder="e.g. 4"
                 />
                 <p className="text-xs text-muted-foreground">
-                  This will be added to your total logged hours and may unlock badges.
+                  This will be added to your total logged hours.
                 </p>
               </div>
             </div>
@@ -142,9 +142,17 @@ export default function EventSignUpButton({
   }
 
   return (
-    <Button size="lg" className="w-full text-base" onClick={handleRegister} disabled={isLoading}>
-      <UserPlus className="mr-2 h-4 w-4" />
-      {isLoading ? 'Registering...' : 'Sign Up for this Event'}
-    </Button>
+    <>
+      <Button size="lg" className="w-full text-base" onClick={handleRegister} disabled={isLoading}>
+        <UserPlus className="mr-2 h-4 w-4" />
+        {isLoading ? 'Registering...' : 'Sign Up for this Event'}
+      </Button>
+
+      <AuthModal
+        open={isAuthModalOpen}
+        onOpenChange={setIsAuthModalOpen}
+        defaultTab="signup"
+      />
+    </>
   );
 }
