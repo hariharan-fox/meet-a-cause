@@ -37,17 +37,13 @@ export default function EventsPage() {
     fetchEvents();
   }, [db]);
 
-  // Build unique location list from real event data
   const locations = useMemo(() => {
     const locs = Array.from(new Set(
-      allEvents
-        .map(e => e.location?.split(',')[0]?.trim())
-        .filter(Boolean)
+      allEvents.map(e => e.location?.split(',')[0]?.trim()).filter(Boolean)
     )).sort();
     return locs;
   }, [allEvents]);
 
-  // Build unique cause list from real event data + fallback to CAUSES constant
   const causes = useMemo(() => {
     const fromEvents = Array.from(new Set(allEvents.map(e => e.cause).filter(Boolean))).sort();
     return fromEvents.length > 0 ? fromEvents : CAUSES;
@@ -62,12 +58,9 @@ export default function EventsPage() {
         event.location?.toLowerCase().includes(q) ||
         event.cause?.toLowerCase().includes(q) ||
         event.skills?.some(s => s.toLowerCase().includes(q));
-
       const matchesLocation = locationFilter === 'all' ||
         event.location?.toLowerCase().includes(locationFilter.toLowerCase());
-
       const matchesCause = causeFilter === 'all' || event.cause === causeFilter;
-
       return matchesSearch && matchesLocation && matchesCause;
     });
   }, [allEvents, searchQuery, locationFilter, causeFilter]);
@@ -85,9 +78,9 @@ export default function EventsPage() {
     <div className="bg-transparent animate-slide-in-from-bottom">
       <div className="container mx-auto px-4 md:px-6 py-8">
         <div className="text-center mb-10">
-          <h1 className="text-2xl font-bold tracking-tight">Find Your Calling</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Things worth showing up for</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Explore diverse opportunities to contribute to causes you care about.
+            Real events happening near you. Find one and show up.
           </p>
         </div>
 
@@ -126,7 +119,6 @@ export default function EventsPage() {
             </Button>
           </div>
 
-          {/* Filter dropdowns */}
           {showFilters && (
             <div className="flex flex-col sm:flex-row gap-3 p-4 bg-muted/30 rounded-xl border">
               <Select value={causeFilter} onValueChange={setCauseFilter}>
@@ -140,7 +132,6 @@ export default function EventsPage() {
                   ))}
                 </SelectContent>
               </Select>
-
               <Select value={locationFilter} onValueChange={setLocationFilter}>
                 <SelectTrigger className="w-full sm:w-[200px] bg-background">
                   <SelectValue placeholder="All Locations" />
@@ -152,7 +143,6 @@ export default function EventsPage() {
                   ))}
                 </SelectContent>
               </Select>
-
               {hasActiveFilters && (
                 <Button variant="ghost" onClick={resetFilters} className="gap-1 text-sm text-muted-foreground">
                   <X className="h-3 w-3" /> Reset all
@@ -161,7 +151,6 @@ export default function EventsPage() {
             </div>
           )}
 
-          {/* Active filter chips */}
           {hasActiveFilters && (
             <div className="flex gap-2 flex-wrap">
               {searchQuery && (
@@ -182,7 +171,6 @@ export default function EventsPage() {
             </div>
           )}
 
-          {/* Results count */}
           {!isLoading && allEvents.length > 0 && (
             <p className="text-xs text-muted-foreground">
               Showing {filteredEvents.length} of {allEvents.length} events
