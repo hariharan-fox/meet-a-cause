@@ -5,9 +5,10 @@ import EventCard from "@/components/shared/event-card";
 import type { Event } from '@/lib/types';
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, X, SlidersHorizontal } from "lucide-react";
+import { Search, X, SlidersHorizontal, Calendar, ArrowRight } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
 import { collection, getDocs } from 'firebase/firestore';
 import { useFirestore } from '@/firebase/provider';
 
@@ -38,10 +39,9 @@ export default function EventsPage() {
   }, [db]);
 
   const locations = useMemo(() => {
-    const locs = Array.from(new Set(
+    return Array.from(new Set(
       allEvents.map(e => e.location?.split(',')[0]?.trim()).filter(Boolean)
     )).sort();
-    return locs;
   }, [allEvents]);
 
   const causes = useMemo(() => {
@@ -80,104 +80,96 @@ export default function EventsPage() {
         <div className="text-center mb-10">
           <h1 className="text-2xl font-bold tracking-tight">Things worth showing up for</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Real events happening near you. Find one and show up.
+            Real events. Real people. Causes that actually need you.
           </p>
         </div>
 
-        {/* Search + Filter Bar */}
-        <div className="mb-8 space-y-4">
-          <div className="flex gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search events, causes, skills..."
-                className="pl-10"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
+        {/* Only show filters if there are events */}
+        {(allEvents.length > 0 || isLoading) && (
+          <div className="mb-8 space-y-4">
+            <div className="flex gap-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search events, causes, skills..."
+                  className="pl-10"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                />
+                {searchQuery && (
+                  <button onClick={() => setSearchQuery('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+              <Button variant="outline" className="gap-2 shrink-0" onClick={() => setShowFilters(f => !f)}>
+                <SlidersHorizontal className="h-4 w-4" />
+                Filters
+                {activeFilterCount > 0 && (
+                  <Badge className="h-4 w-4 p-0 flex items-center justify-center text-[10px]">
+                    {activeFilterCount}
+                  </Badge>
+                )}
+              </Button>
             </div>
-            <Button
-              variant="outline"
-              className="gap-2 shrink-0"
-              onClick={() => setShowFilters(f => !f)}
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              Filters
-              {activeFilterCount > 0 && (
-                <Badge className="h-4 w-4 p-0 flex items-center justify-center text-[10px]">
-                  {activeFilterCount}
-                </Badge>
-              )}
-            </Button>
+
+            {showFilters && (
+              <div className="flex flex-col sm:flex-row gap-3 p-4 bg-muted/30 rounded-xl border">
+                <Select value={causeFilter} onValueChange={setCauseFilter}>
+                  <SelectTrigger className="w-full sm:w-[180px] bg-background">
+                    <SelectValue placeholder="All Causes" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Causes</SelectItem>
+                    {causes.map(cause => <SelectItem key={cause} value={cause}>{cause}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <Select value={locationFilter} onValueChange={setLocationFilter}>
+                  <SelectTrigger className="w-full sm:w-[200px] bg-background">
+                    <SelectValue placeholder="All Locations" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Locations</SelectItem>
+                    {locations.map(location => <SelectItem key={location} value={location}>{location}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                {hasActiveFilters && (
+                  <Button variant="ghost" onClick={resetFilters} className="gap-1 text-sm text-muted-foreground">
+                    <X className="h-3 w-3" /> Reset all
+                  </Button>
+                )}
+              </div>
+            )}
+
+            {hasActiveFilters && (
+              <div className="flex gap-2 flex-wrap">
+                {searchQuery && (
+                  <Badge variant="secondary" className="gap-1 cursor-pointer" onClick={() => setSearchQuery('')}>
+                    "{searchQuery}" <X className="h-3 w-3" />
+                  </Badge>
+                )}
+                {causeFilter !== 'all' && (
+                  <Badge variant="secondary" className="gap-1 cursor-pointer" onClick={() => setCauseFilter('all')}>
+                    {causeFilter} <X className="h-3 w-3" />
+                  </Badge>
+                )}
+                {locationFilter !== 'all' && (
+                  <Badge variant="secondary" className="gap-1 cursor-pointer" onClick={() => setLocationFilter('all')}>
+                    {locationFilter} <X className="h-3 w-3" />
+                  </Badge>
+                )}
+              </div>
+            )}
+
+            {!isLoading && allEvents.length > 0 && (
+              <p className="text-xs text-muted-foreground">
+                Showing {filteredEvents.length} of {allEvents.length} events
+                {hasActiveFilters && ' matching your filters'}
+              </p>
+            )}
           </div>
-
-          {showFilters && (
-            <div className="flex flex-col sm:flex-row gap-3 p-4 bg-muted/30 rounded-xl border">
-              <Select value={causeFilter} onValueChange={setCauseFilter}>
-                <SelectTrigger className="w-full sm:w-[180px] bg-background">
-                  <SelectValue placeholder="All Causes" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Causes</SelectItem>
-                  {causes.map(cause => (
-                    <SelectItem key={cause} value={cause}>{cause}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={locationFilter} onValueChange={setLocationFilter}>
-                <SelectTrigger className="w-full sm:w-[200px] bg-background">
-                  <SelectValue placeholder="All Locations" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Locations</SelectItem>
-                  {locations.map(location => (
-                    <SelectItem key={location} value={location}>{location}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {hasActiveFilters && (
-                <Button variant="ghost" onClick={resetFilters} className="gap-1 text-sm text-muted-foreground">
-                  <X className="h-3 w-3" /> Reset all
-                </Button>
-              )}
-            </div>
-          )}
-
-          {hasActiveFilters && (
-            <div className="flex gap-2 flex-wrap">
-              {searchQuery && (
-                <Badge variant="secondary" className="gap-1 cursor-pointer" onClick={() => setSearchQuery('')}>
-                  "{searchQuery}" <X className="h-3 w-3" />
-                </Badge>
-              )}
-              {causeFilter !== 'all' && (
-                <Badge variant="secondary" className="gap-1 cursor-pointer" onClick={() => setCauseFilter('all')}>
-                  {causeFilter} <X className="h-3 w-3" />
-                </Badge>
-              )}
-              {locationFilter !== 'all' && (
-                <Badge variant="secondary" className="gap-1 cursor-pointer" onClick={() => setLocationFilter('all')}>
-                  {locationFilter} <X className="h-3 w-3" />
-                </Badge>
-              )}
-            </div>
-          )}
-
-          {!isLoading && allEvents.length > 0 && (
-            <p className="text-xs text-muted-foreground">
-              Showing {filteredEvents.length} of {allEvents.length} events
-              {hasActiveFilters && ' matching your filters'}
-            </p>
-          )}
-        </div>
+        )}
 
         {/* Event Grid */}
         {isLoading ? (
@@ -186,6 +178,27 @@ export default function EventsPage() {
               <div key={i} className="h-48 rounded-2xl bg-muted animate-pulse" />
             ))}
           </div>
+        ) : allEvents.length === 0 ? (
+          /* No events at all — coming soon state */
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+              <Calendar className="h-10 w-10 text-primary/60" />
+            </div>
+            <h2 className="text-xl font-bold mb-3">We are working on it</h2>
+            <p className="text-muted-foreground text-sm max-w-md leading-relaxed">
+              Our first events are being lined up right now. We are onboarding organisations and curating experiences worth showing up for. Check back soon.
+            </p>
+            <div className="mt-8 flex gap-3 flex-wrap justify-center">
+              <Button asChild>
+                <Link href="/signup">
+                  Join the Waitlist <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link href="/ngos">Browse Organisations</Link>
+              </Button>
+            </div>
+          </div>
         ) : filteredEvents.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredEvents.map(event => (
@@ -193,20 +206,13 @@ export default function EventsPage() {
             ))}
           </div>
         ) : (
+          /* No results matching filters */
           <div className="text-center text-muted-foreground bg-accent/50 p-12 rounded-2xl">
-            <h3 className="font-semibold">
-              {allEvents.length === 0 ? 'No events added yet' : 'No events found'}
-            </h3>
-            <p className="text-sm mt-2">
-              {allEvents.length === 0
-                ? 'Check back soon — events are being added!'
-                : 'Try adjusting your search or clearing filters.'}
-            </p>
-            {hasActiveFilters && (
-              <Button variant="link" onClick={resetFilters} className="mt-2 text-sm">
-                Clear all filters
-              </Button>
-            )}
+            <h3 className="font-semibold">No events found</h3>
+            <p className="text-sm mt-2">Try adjusting your search or clearing filters.</p>
+            <Button variant="link" onClick={resetFilters} className="mt-2 text-sm">
+              Clear all filters
+            </Button>
           </div>
         )}
       </div>
