@@ -83,8 +83,6 @@ export default function ForNGOsPage() {
       {/* ── HERO ── */}
       <section className="max-w-6xl mx-auto px-6 pt-16 pb-20 md:pt-24 md:pb-28">
         <div className="grid md:grid-cols-2 gap-0 border border-border rounded-3xl overflow-hidden">
-
-          {/* Left — copy */}
           <div className="px-10 py-12 md:py-16 bg-card">
             <p className="font-body text-xs font-medium tracking-widest uppercase text-primary mb-4">
               For organisations
@@ -96,15 +94,13 @@ export default function ForNGOsPage() {
               No cold outreach. No ghost registrations. Just people who turn up.
             </p>
             <Link
-              href="#apply"
+              href="/register-organisation"
               className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-body font-medium text-sm px-6 py-3 rounded-full hover:opacity-90 transition-opacity"
             >
               Get your organisation listed
               <ArrowRight size={15} />
             </Link>
           </div>
-
-          {/* Right — empty for image */}
           <div className="hidden md:block bg-accent/30 min-h-[420px]" />
         </div>
       </section>
@@ -215,7 +211,7 @@ export default function ForNGOsPage() {
             </p>
           </div>
           <Link
-            href="#"
+            href="/register-organisation"
             className="flex-shrink-0 inline-flex items-center gap-2 bg-primary text-primary-foreground font-body font-medium text-sm px-6 py-3 rounded-full hover:opacity-90 transition-opacity whitespace-nowrap"
           >
             List your organisation <ArrowRight size={15} />
