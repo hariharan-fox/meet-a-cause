@@ -1,26 +1,28 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/lib/auth-context';
-import { LogOut, ArrowRight, Copy, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { LogOut, ArrowRight, Copy, ShieldCheck, AlertTriangle, Camera, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { useFirestore } from '@/firebase/provider';
+import { useAuth as useFirebaseAuth } from '@/firebase/provider';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import type { Event } from '@/lib/types';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { useAuth as useFirebaseAuth } from '@/firebase/provider';
 import { RecaptchaVerifier, signInWithPhoneNumber, PhoneAuthProvider, linkWithCredential, type ConfirmationResult } from 'firebase/auth';
+import { Progress } from '@/components/ui/progress';
 
 declare global {
   interface Window { recaptchaVerifier?: RecaptchaVerifier; }
@@ -31,11 +33,17 @@ export default function SettingsPage() {
   const firebaseAuth = useFirebaseAuth();
   const { toast } = useToast();
   const db = useFirestore();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [name, setName] = useState(user?.name || '');
   const [skills, setSkills] = useState(user?.skills?.join(', ') || '');
   const [interests, setInterests] = useState(user?.interests?.join(', ') || '');
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+
+  // Profile picture
+  const [avatarUrl, setAvatarUrl] = useState(user?.avatarUrl || '');
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
@@ -53,8 +61,6 @@ export default function SettingsPage() {
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteReason, setDeleteReason] = useState('');
-
-  // Real event history from Firestore
   const [completedEvents, setCompletedEvents] = useState<Event[]>([]);
 
   useEffect(() => {
@@ -62,8 +68,8 @@ export default function SettingsPage() {
     setName(user.name);
     setSkills(user.skills?.join(', ') || '');
     setInterests(user.interests?.join(', ') || '');
+    setAvatarUrl(user.avatarUrl || '');
 
-    // Fetch completed events from Firestore
     async function fetchCompletedEvents() {
       if (!user?.completedEventIds?.length) return;
       try {
@@ -77,7 +83,59 @@ export default function SettingsPage() {
     fetchCompletedEvents();
   }, [user, db]);
 
-  const referralLink = `https://meetacause.vercel.app/signup?ref=${user?.id || ''}`;
+  // Handle profile picture upload
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({ variant: 'destructive', title: 'Invalid file', description: 'Please select an image file.' });
+      return;
+    }
+
+    // Validate file size (2MB max)
+    if (file.size > 2 * 1024 * 1024) {
+      toast({ variant: 'destructive', title: 'File too large', description: 'Please select an image under 2MB.' });
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+    setUploadProgress(0);
+
+    try {
+      const storage = getStorage();
+      const storageRef = ref(storage, `profile-pictures/${user.id}/${Date.now()}_${file.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      uploadTask.on('state_changed',
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setUploadProgress(Math.round(progress));
+        },
+        (error) => {
+          console.error('Upload error:', error);
+          toast({ variant: 'destructive', title: 'Upload Failed', description: 'Please try again.' });
+          setIsUploadingAvatar(false);
+          setUploadProgress(0);
+        },
+        async () => {
+          const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
+          setAvatarUrl(downloadUrl);
+          await updateUser({ avatarUrl: downloadUrl });
+          toast({ title: 'Profile Picture Updated!', description: 'Your new photo is now live.' });
+          setIsUploadingAvatar(false);
+          setUploadProgress(0);
+        }
+      );
+    } catch (error: any) {
+      toast({ variant: 'destructive', title: 'Upload Failed', description: error.message });
+      setIsUploadingAvatar(false);
+      setUploadProgress(0);
+    }
+  };
+
+  const referralLink = `https://meetacause.in/signup?ref=${user?.id || ''}`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(referralLink);
@@ -146,7 +204,7 @@ export default function SettingsPage() {
     setPasswordError(null);
     setPasswordSuccess(null);
     if (newPassword !== confirmPassword) { setPasswordError('Passwords do not match.'); return; }
-    if (newPassword.length < 6) { setPasswordError('Password must be at least 6 characters.'); return; }
+    if (newPassword.length < 8) { setPasswordError('Password must be at least 8 characters.'); return; }
     setIsChangingPassword(true);
     try {
       await changePassword(currentPassword, newPassword);
@@ -186,14 +244,54 @@ export default function SettingsPage() {
           <form onSubmit={handleProfileUpdate}>
             <CardHeader>
               <CardTitle className="text-base">Public Profile</CardTitle>
-              <CardDescription>Update your name, skills, and interests.</CardDescription>
+              <CardDescription>Update your name, photo, skills, and interests.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="flex items-center gap-4">
-                <Avatar className="h-20 w-20">
-                  <AvatarFallback className="text-2xl">{user.name?.charAt(0).toUpperCase() || 'V'}</AvatarFallback>
-                </Avatar>
+
+              {/* Profile Picture Upload */}
+              <div className="flex items-center gap-6">
+                <div className="relative">
+                  <Avatar className="h-20 w-20">
+                    {avatarUrl ? (
+                      <AvatarImage src={avatarUrl} alt={user.name} />
+                    ) : null}
+                    <AvatarFallback className="text-2xl">
+                      {user.name?.charAt(0).toUpperCase() || 'V'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploadingAvatar}
+                    className="absolute -bottom-1 -right-1 h-7 w-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-md hover:bg-primary/90 transition-colors disabled:opacity-50"
+                  >
+                    {isUploadingAvatar
+                      ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      : <Camera className="h-3.5 w-3.5" />
+                    }
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleAvatarChange}
+                  />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Profile Photo</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Click the camera icon to upload. Max 2MB, JPG or PNG.
+                  </p>
+                  {isUploadingAvatar && (
+                    <div className="mt-2 space-y-1">
+                      <Progress value={uploadProgress} className="h-1.5" />
+                      <p className="text-xs text-muted-foreground">{uploadProgress}% uploaded</p>
+                    </div>
+                  )}
+                </div>
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
                 <Input id="name" value={name} onChange={e => setName(e.target.value)} />
@@ -224,7 +322,7 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Phone Verification</CardTitle>
-            <CardDescription>Verify your phone number to unlock the "Communicator" badge.</CardDescription>
+            <CardDescription>Verify your phone number for account security.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {user.phoneNumber ? (
@@ -264,7 +362,7 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Refer a Friend</CardTitle>
-            <CardDescription>Invite friends to join Meet A Cause and earn badges.</CardDescription>
+            <CardDescription>Invite friends to join Meet A Cause.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -276,7 +374,7 @@ export default function SettingsPage() {
                 </Button>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground">Share this link with friends to earn referral badges.</p>
+            <p className="text-xs text-muted-foreground">Share this link with friends to invite them to the platform.</p>
           </CardContent>
         </Card>
 
@@ -353,7 +451,7 @@ export default function SettingsPage() {
                     <AlertDialogContent>
                       <AlertDialogHeader>
                         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                        <AlertDialogDescription>This action cannot be undone and will permanently delete your account.</AlertDialogDescription>
+                        <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
                       </AlertDialogHeader>
                       <div className="py-4 space-y-2">
                         <Label htmlFor="delete-reason" className="text-sm font-medium">Why are you leaving? (optional)</Label>
