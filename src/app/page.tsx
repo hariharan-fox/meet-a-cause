@@ -33,19 +33,19 @@ const personas = [
     label: 'The Specialist',
     title: 'The one with skills',
     desc: 'Architects, developers, and artists bringing their professional craft to grassroots community projects.',
-    image: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg',
+    image: 'https://firebasestorage.googleapis.com/v0/b/studio-9823971235-a7e78.firebasestorage.app/o/landing-page-images%2FThe%20one%20with%20skills.jpg?alt=media&token=4eb540af-f980-4c67-8120-89e5a6334f0b',
   },
   {
     label: 'The Heart',
     title: 'The one with time',
     desc: 'Students, retirees, and weekend warriors who believe their time is the most valuable gift they can give.',
-    image: 'https://images.pexels.com/photos/7551667/pexels-photo-7551667.jpeg',
+    image: 'https://firebasestorage.googleapis.com/v0/b/studio-9823971235-a7e78.firebasestorage.app/o/landing-page-images%2FThe%20one%20with%20time.jpg?alt=media&token=bd9e002b-c27f-4f6d-817e-ac1590733a52',
   },
   {
     label: 'The Explorer',
     title: 'The one who just moved',
     desc: 'Newcomers using causes as a way to discover the soul of their city and meet their new best friends.',
-    image: 'https://images.pexels.com/photos/1454360/pexels-photo-1454360.jpeg',
+    image: 'https://firebasestorage.googleapis.com/v0/b/studio-9823971235-a7e78.firebasestorage.app/o/landing-page-images%2FThe%20one%20who%20just%20moved.jpg?alt=media&token=08088f6f-27e3-489a-bc6f-d3b410d54f89',
   },
 ];
 
@@ -182,6 +182,7 @@ export default function HomePage() {
                   alt={p.title}
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  unoptimized
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-6">
