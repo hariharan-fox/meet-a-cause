@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/lib/auth-context';
 import { Logo } from '../shared/logo';
 import { cn } from '@/lib/utils';
@@ -50,6 +50,9 @@ export default function Header() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-full">
                 <Avatar className="h-8 w-8">
+                  {user?.avatarUrl && (
+                    <AvatarImage src={user.avatarUrl} alt={user.name} />
+                  )}
                   <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || 'V'}</AvatarFallback>
                 </Avatar>
                 <span className="sr-only">Toggle user menu</span>
@@ -62,7 +65,7 @@ export default function Header() {
                 <Link href="/settings">Settings</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <a href="mailto:support@meetacause.vercel.app">Support</a>
+                <a href="mailto:hello@meetacause.in">Support</a>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
@@ -73,22 +76,19 @@ export default function Header() {
     );
   }
 
-  // Public header for unauthenticated users
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b bg-background/80 backdrop-blur-lg px-4 sm:px-6">
       <div className="flex items-center gap-4">
         <Logo />
       </div>
 
-      {/* Desktop nav */}
       <nav className="hidden items-center gap-2 md:flex">
         <Button variant="ghost" asChild><Link href="/events">Events</Link></Button>
-        <Button variant="ghost" asChild><Link href="/ngos">Organizations</Link></Button>
+        <Button variant="ghost" asChild><Link href="/ngos">Organisations</Link></Button>
         <Button variant="ghost" asChild><Link href="/login">Login</Link></Button>
         <Button asChild><Link href="/signup">Sign Up</Link></Button>
       </nav>
 
-      {/* Mobile nav */}
       <div className="md:hidden">
         <Sheet>
           <SheetTrigger asChild>
@@ -104,7 +104,7 @@ export default function Header() {
             </div>
             <nav className="grid gap-4 text-base p-4">
               <Link href="/events" className="text-muted-foreground hover:text-foreground">Events</Link>
-              <Link href="/ngos" className="text-muted-foreground hover:text-foreground">Organizations</Link>
+              <Link href="/ngos" className="text-muted-foreground hover:text-foreground">Organisations</Link>
             </nav>
             <div className="mt-auto p-4 space-y-4 border-t">
               <Button asChild variant="outline" className="w-full"><Link href="/login">Login</Link></Button>
