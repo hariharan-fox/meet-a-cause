@@ -118,7 +118,7 @@ export default function HomePage() {
               opacity-0 animate-[fade-in-up_0.6s_ease_0.25s_forwards]"
           >
             <Image
-              src="https://images.pexels.com/photos/15868483/pexels-photo-15868483.jpeg"
+              src="https://firebasestorage.googleapis.com/v0/b/studio-9823971235-a7e78.firebasestorage.app/o/landing-page-images%2FMeet%20A%20Cause.jpg?alt=media&token=3852b751-cc32-4dab-a0cb-8572d30eaef2"
               alt="People showing up for a cause"
               fill
               className="object-cover"
