@@ -10,7 +10,7 @@ import { Merriweather, Inter } from 'next/font/google';
 import {
   GoogleTagManagerScript,
   GoogleTagManagerNoScript,
-} from '@/components/googletagmanager';
+} from '@/components/GoogleTagManager';
 
 const headlineFont = Merriweather({
   subsets: ['latin'],
