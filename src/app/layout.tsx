@@ -7,6 +7,10 @@ import { BadgeUnlockProvider } from '@/lib/badge-unlock-context';
 import { ClientLayout } from '@/components/layout/client-layout';
 import { FirebaseClientProvider } from '@/firebase';
 import { Merriweather, Inter } from 'next/font/google';
+import {
+  GoogleTagManagerScript,
+  GoogleTagManagerNoScript,
+} from '@/components/GoogleTagManager';
 
 const headlineFont = Merriweather({
   subsets: ['latin'],
@@ -33,7 +37,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={cn(headlineFont.variable, bodyFont.variable)}>
+      <head>
+        <GoogleTagManagerScript />
+      </head>
       <body className={cn('min-h-screen bg-background font-body text-foreground/90 antialiased')}>
+        <GoogleTagManagerNoScript />
         <FirebaseClientProvider>
           <BadgeUnlockProvider>
             <AuthProvider>
