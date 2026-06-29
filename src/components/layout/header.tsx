@@ -104,7 +104,7 @@ export default function Header() {
             </div>
             <nav className="grid gap-4 text-base p-4">
               <Link href="/events" className="text-muted-foreground hover:text-foreground">Events</Link>
-              <Link href="/ngos" className="text-muted-foreground hover:text-foreground">Organisations</Link>
+              <Link href="/for-ngos" className="text-muted-foreground hover:text-foreground">Organisations</Link>
             </nav>
             <div className="mt-auto p-4 space-y-4 border-t">
               <Button asChild variant="outline" className="w-full"><Link href="/login">Login</Link></Button>
