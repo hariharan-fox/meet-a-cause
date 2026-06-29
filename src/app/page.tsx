@@ -88,10 +88,10 @@ export default function HomePage() {
             Explore Events <ArrowRight size={15} />
           </Link>
           <Link
-            href="/for-ngos"
+            href="/signup"
             className="inline-flex items-center gap-2 border border-border bg-card text-foreground font-body font-medium text-sm px-7 py-3.5 rounded-full hover:bg-secondary transition-colors"
           >
-            For Organisations
+            Get Started
           </Link>
         </div>
       </section>
