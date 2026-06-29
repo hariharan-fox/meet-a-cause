@@ -10,7 +10,7 @@ import { Merriweather, Inter } from 'next/font/google';
 import {
   GoogleTagManagerScript,
   GoogleTagManagerNoScript,
-} from '@/components/GoogleTagManager';
+} from '@/components/googletagmanager';
 
 const headlineFont = Merriweather({
   subsets: ['latin'],
@@ -28,6 +28,9 @@ const bodyFont = Inter({
 export const metadata: Metadata = {
   title: 'Meet A Cause',
   description: 'Connecting volunteers with NGOs for a better world.',
+  verification: {
+    google: '9sQq3hzdXUliJdYWaT25cTlwmze_Tz_clUhW7e6BWno',
+  },
 };
 
 export default function RootLayout({
