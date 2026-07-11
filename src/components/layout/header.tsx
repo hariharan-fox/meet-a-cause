@@ -85,6 +85,7 @@ export default function Header() {
       <nav className="hidden items-center gap-2 md:flex">
         <Button variant="ghost" asChild><Link href="/events">Events</Link></Button>
         <Button variant="ghost" asChild><Link href="/for-ngos">Organisations</Link></Button>
+        <Button variant="ghost" asChild><Link href="/about">About</Link></Button>
         <Button variant="ghost" asChild><Link href="/login">Login</Link></Button>
         <Button asChild><Link href="/signup">Sign Up</Link></Button>
       </nav>
