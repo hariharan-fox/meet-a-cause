@@ -30,11 +30,11 @@ const pillars = [
   },
   {
     name: 'Social Structures',
-    desc: 'The invisible architecture that shapes who gets what and who does not — and why things are the way they are. Caste and its persistence across every domain of Indian life. Class and economic inequality. Gender and patriarchy and the ways they organise everyone\'s life whether they notice it or not. Media and narrative power — who gets to tell the story. Technology and power. Urban and rural divides. Public health systems. Disability and inclusion. The most interesting and most difficult questions live at the crossings.',
+    desc: "The invisible architecture that shapes who gets what and who does not — and why things are the way they are. Caste and its persistence across every domain of Indian life. Class and economic inequality. Gender and patriarchy and the ways they organise everyone's life whether they notice it or not. Media and narrative power — who gets to tell the story. Technology and power. Urban and rural divides. Public health systems. Disability and inclusion. The most interesting and most difficult questions live at the crossings.",
   },
   {
     name: 'Humans',
-    desc: 'What it means to be a person in the world — in all its difficulty and beauty. Identity and belonging and the search for both. The philosophy of being. Dignity and the violence of its absence. Migration and displacement. Conflict and peace. Loneliness and connection and the epidemic of the former. Memory and collective identity. Livelihood and economic dignity. Diversity and coexistence — not as a slogan but as a daily practice. Love and compassion. The most universal pillar — and the one everything else ultimately comes back to.',
+    desc: "What it means to be a person in the world — in all its difficulty and beauty. Identity and belonging and the search for both. The philosophy of being. Dignity and the violence of its absence. Migration and displacement. Conflict and peace. Loneliness and connection and the epidemic of the former. Memory and collective identity. Livelihood and economic dignity. Diversity and coexistence — not as a slogan but as a daily practice. Love and compassion. The most universal pillar — and the one everything else ultimately comes back to.",
   },
   {
     name: 'Joy, Play and Creative Expression',
@@ -53,26 +53,29 @@ export default function AboutPage() {
             About Meet A Cause
           </p>
           <h1 className="font-headline text-4xl md:text-5xl text-foreground leading-[1.15] tracking-tight">
-            We are not a volunteering platform.
+            There is a version of your life where you are more present in the world around you.
           </h1>
           <p className="font-body text-lg text-muted-foreground leading-relaxed">
-            We are a social experience platform where interesting people show up for things that matter.
+            Where the questions you carry have somewhere to go. Where the things you care about — quietly, privately — become things you actually do something about.
+          </p>
+          <p className="font-body text-lg text-foreground font-medium leading-relaxed">
+            Meet A Cause is how you get there.
           </p>
         </section>
 
-        {/* ── WHAT WE ARE ── */}
+        {/* ── BRIDGE ── */}
         <section className="space-y-5">
           <p className="font-body text-base text-foreground leading-relaxed">
-            The world is full of people who care. They care about their city, their communities, the environment, the children in schools down the road. They care quietly, privately — and then go on with their day because there was nothing pulling them toward action.
+            Everyone is carrying questions they have not answered yet.
           </p>
           <p className="font-body text-base text-foreground leading-relaxed">
-            Meet A Cause is that pull.
+            About themselves. About what they care about. About what kind of life they are actually building versus the one they imagined.
           </p>
           <p className="font-body text-base text-foreground leading-relaxed">
-            We find causes, organisations, and people doing real work — and turn them into experiences you can actually join. A beach cleanup that ends with breakfast. A skills session at a school that becomes a conversation you did not expect. A run for a cause that leaves you with three new friends and a reason to come back next month.
+            The answers rarely come from thinking alone. They come from doing. From being present in something real. From showing up in a room with people who care about something — and discovering, in that room, something you did not know about yourself before you walked in.
           </p>
           <p className="font-body text-base text-foreground leading-relaxed">
-            Impact is the outcome. Not the pitch.
+            Meet A Cause is the bridge between the question inside you and the experience that begins to answer it.
           </p>
         </section>
 
@@ -93,10 +96,13 @@ export default function AboutPage() {
             The platform is how we do this work. Meet A Cause is not separate from the mission — it is the method. Every event listed here, every organisation we partner with, every person who shows up is part of how we find what works and what does not. The platform is not the product. The work is the product. The platform is just how we bring people to it.
           </p>
           <p className="font-body text-base text-foreground leading-relaxed">
-            Each of the nine areas we care about is a living landscape full of specific, urgent, unresolved problems. Problems that have existed for generations. Problems that have been studied, debated, campaigned about, and legislated around — and that persist anyway, because the systems that produce them are more durable than the efforts to fix them.
+            Each of the nine areas we care about is a living landscape — full of people already doing the work, ideas being tested in real time, and questions that have not been fully answered yet.
           </p>
           <p className="font-body text-base text-foreground leading-relaxed">
-            We are not here to describe those problems. We are here to work on them. Slowly, honestly, in collaboration with the organisations and communities that are already inside them — finding approaches that do not just address symptoms but reach toward something more sustainable. More structural. More real.
+            Some of what exists here is working and needs to be taken further. Some of it needs reassessment — a better structure, a sharper approach, a different angle entirely. Some of it is still being figured out and needs honest collaboration to move forward.
+          </p>
+          <p className="font-body text-base text-foreground leading-relaxed">
+            We are not here to catalogue what is wrong. We are here to work toward a better tomorrow — finding solutions where none exist yet, and optimising what already does, together.
           </p>
         </section>
 
@@ -136,7 +142,16 @@ export default function AboutPage() {
               Nine dimensions of a conscious life
             </h2>
             <p className="font-body text-base text-muted-foreground leading-relaxed">
-              Not categories for filtering — a framework for understanding what it means to live as a conscious human being in community with other conscious human beings. The edges between them are porous by design. Because the world does not organise itself into categories. Joy and Justice are not opposites. They are, ultimately, the same project.
+              Not categories for filtering — a framework for understanding what it means to live as a conscious human being in community with other conscious human beings.
+            </p>
+            <p className="font-body text-base text-muted-foreground leading-relaxed">
+              We arrived at these nine by cross-referencing three of the most rigorous frameworks humanity has produced for thinking about a complete human life — the UN Sustainable Development Goals, Martha Nussbaum's ten core human capabilities, and the Purushartha framework from ancient Indian philosophy: Dharma, Artha, Kama, Moksha. Each pillar found a home across all three. Nothing that survived that test felt arbitrary.
+            </p>
+            <p className="font-body text-base text-muted-foreground leading-relaxed">
+              The edges between them are porous by design. Because the world does not organise itself into categories. A conversation about mental health leads into a conversation about family patterns leads into a conversation about the social norms that decide whose mental health is taken seriously. Joy and Justice are not opposites. They are, ultimately, the same project.
+            </p>
+            <p className="font-body text-base text-muted-foreground leading-relaxed">
+              These nine are where we stand today. They may evolve as we learn more. Some may merge. New ones may emerge. We are not attached to the number — we are attached to the honesty of the inquiry.
             </p>
           </div>
           <div className="space-y-4">
@@ -158,7 +173,7 @@ export default function AboutPage() {
 
         <div className="border-t border-border" />
 
-        {/* ── WHAT WE ARE BUILDING TOWARD ── */}
+        {/* ── BUILDING TOWARD ── */}
         <section className="space-y-5">
           <h2 className="font-headline text-2xl md:text-3xl text-foreground leading-snug">
             What we are building toward
@@ -182,7 +197,32 @@ export default function AboutPage() {
 
         <div className="border-t border-border" />
 
-        {/* ── CLOSING ── */}
+        {/* ── FOUNDER NOTE ── */}
+        <section className="space-y-5">
+          <p className="font-body text-xs font-medium tracking-widest uppercase text-primary">
+            A note from the founder
+          </p>
+          <p className="font-body text-base text-foreground leading-relaxed">
+            I am not doing this out of compulsion.
+          </p>
+          <p className="font-body text-base text-foreground leading-relaxed">
+            I do this because I myself am in need of understanding. I have questions — lots of them — and this is my way of exploring them. The journey may lead nowhere. Or it may make an impact. I am not particularly concerned about either outcome.
+          </p>
+          <p className="font-body text-base text-foreground leading-relaxed">
+            What I have is the joy of exploring things that give me satisfaction — and may help others along the way. I live in the moment. I may not know whether what I am experiencing is illusion or reality. But what I am enjoying is the journey itself.
+          </p>
+          <p className="font-body text-base text-foreground leading-relaxed">
+            That is enough for me.
+          </p>
+          <div className="pt-2">
+            <p className="font-body text-base text-foreground">Inner Peace ✌️</p>
+            <p className="font-body text-base text-foreground font-medium mt-1">Hariharan M</p>
+          </div>
+        </section>
+
+        <div className="border-t border-border" />
+
+        {/* ── CLOSING CTA ── */}
         <section className="space-y-6 pb-8">
           <h2 className="font-headline text-2xl md:text-3xl text-foreground leading-snug">
             Come as you are. Show up for what matters.
