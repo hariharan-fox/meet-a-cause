@@ -16,6 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/lib/auth-context';
 import { Logo } from '../shared/logo';
 import { cn } from '@/lib/utils';
+import { GoogleTranslateWidget } from '../shared/google-translate-widget';
 
 export default function Header() {
   const { user, logout } = useAuth();
@@ -29,7 +30,9 @@ export default function Header() {
           <Logo />
         </div>
 
-        <div className="flex items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
+        <div className="flex items-center gap-3 md:ml-auto">
+          <GoogleTranslateWidget />
+
           <Button asChild variant="ghost" size="icon" className="rounded-full relative">
             <Link href="/notifications">
               <Bell className="h-5 w-5" />
@@ -82,7 +85,9 @@ export default function Header() {
         <Logo />
       </div>
 
+      {/* Desktop nav */}
       <nav className="hidden items-center gap-2 md:flex">
+        <GoogleTranslateWidget />
         <Button variant="ghost" asChild><Link href="/events">Events</Link></Button>
         <Button variant="ghost" asChild><Link href="/for-ngos">Organisations</Link></Button>
         <Button variant="ghost" asChild><Link href="/about">About</Link></Button>
@@ -90,6 +95,7 @@ export default function Header() {
         <Button asChild><Link href="/signup">Sign Up</Link></Button>
       </nav>
 
+      {/* Mobile nav */}
       <div className="md:hidden">
         <Sheet>
           <SheetTrigger asChild>
@@ -106,8 +112,12 @@ export default function Header() {
             <nav className="grid gap-4 text-base p-4">
               <Link href="/events" className="text-muted-foreground hover:text-foreground">Events</Link>
               <Link href="/for-ngos" className="text-muted-foreground hover:text-foreground">Organisations</Link>
+              <Link href="/about" className="text-muted-foreground hover:text-foreground">About</Link>
             </nav>
             <div className="mt-auto p-4 space-y-4 border-t">
+              <div className="pb-2">
+                <GoogleTranslateWidget />
+              </div>
               <Button asChild variant="outline" className="w-full"><Link href="/login">Login</Link></Button>
               <Button asChild className="w-full"><Link href="/signup">Sign Up</Link></Button>
             </div>
